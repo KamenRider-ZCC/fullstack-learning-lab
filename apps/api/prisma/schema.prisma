@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ReviewItem {
+  id          String        @id
+  title       String
+  description String
+  maxScore    Float
+  aiScore     Float
+  scores      ExpertScore[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ExpertScore {
+  id           String     @id @default(cuid())
+  reviewItemId String
+  bidderId     String
+  expertId     String
+  score        Float
+  feedback     String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  reviewItem   ReviewItem @relation(fields: [reviewItemId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewItemId, bidderId, expertId])
+  @@index([reviewItemId])
+}

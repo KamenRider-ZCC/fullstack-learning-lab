@@ -8,7 +8,8 @@
 
 ## 当前进度
 
-已完成第 1 课：浏览器调用后端健康检查接口。先理解一次 HTTP 请求如何从页面到达后端，再逐步增加业务复杂度。
+- 第 1 课：浏览器调用后端健康检查接口。
+- 第 2 课：使用 PostgreSQL 和 Prisma 查询、保存专家评分。
 
 ## 启动
 
@@ -17,8 +18,12 @@
 ```powershell
 cd D:\projects\fullstack-learning-lab
 pnpm install
+pnpm db:up
+pnpm db:migrate
 pnpm dev
 ```
+
+`db:migrate` 首次运行或数据库结构变化时执行，日常启动只需 `pnpm db:up` 和 `pnpm dev`。
 
 启动后访问：
 
@@ -29,10 +34,10 @@ pnpm dev
 
 ## 推荐学习方式
 
-1. 先阅读 `docs/01-http-api.md`。
-2. 自己启动项目并点击“重新请求”。
-3. 给健康接口增加一个字段，同时修改前端类型和页面展示。
-4. 能解释请求经过的每一层后，再进入下一课。
+1. 先阅读 `docs/01-http-api.md` 和 `docs/02-database-prisma.md`。
+2. 保存一个专家评分并刷新页面，确认数据仍存在。
+3. 执行 `pnpm db:studio`，在网页中查看数据库记录。
+4. 能解释 Controller、Service、Prisma 和 PostgreSQL 的职责后，再进入下一课。
 
 完整路线见 `docs/roadmap.md`，陌生词汇见 `docs/glossary.md`。
 
@@ -42,6 +47,9 @@ pnpm dev
 pnpm dev      # 同时启动前端和后端
 pnpm check    # TypeScript 静态检查
 pnpm build    # 生成生产构建
+pnpm db:up    # 启动 PostgreSQL
+pnpm db:down  # 停止 PostgreSQL
+pnpm db:studio # 可视化查看数据库
 ```
 
 学习阶段不要把 Token、密码或数据库连接信息提交到 Git；本地配置放在 `.env`。

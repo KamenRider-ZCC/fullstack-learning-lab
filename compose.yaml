@@ -1,0 +1,21 @@
+name: fullstack-learning-lab
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: fullstack_lab
+      POSTGRES_USER: fullstack
+      POSTGRES_PASSWORD: fullstack_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fullstack -d fullstack_lab"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:

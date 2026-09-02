@@ -6,6 +6,11 @@
   "scripts": {
     "dev": "pnpm --stream --parallel --filter @fullstack-lab/api --filter @fullstack-lab/web run dev",
     "build": "pnpm --filter @fullstack-lab/api --filter @fullstack-lab/web run build",
-    "check": "pnpm --filter @fullstack-lab/api --filter @fullstack-lab/web run check"
+    "check": "pnpm --filter @fullstack-lab/api --filter @fullstack-lab/web run check",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "db:migrate": "pnpm --filter @fullstack-lab/api run db:migrate",
+    "db:studio": "pnpm --filter @fullstack-lab/api run db:studio"
   }
 }
