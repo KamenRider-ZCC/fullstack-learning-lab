@@ -1,0 +1,11 @@
+{
+  "name": "fullstack-learning-lab",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.12.4",
+  "scripts": {
+    "dev": "pnpm --stream --parallel --filter @fullstack-lab/api --filter @fullstack-lab/web run dev",
+    "build": "pnpm --filter @fullstack-lab/api --filter @fullstack-lab/web run build",
+    "check": "pnpm --filter @fullstack-lab/api --filter @fullstack-lab/web run check"
+  }
+}
