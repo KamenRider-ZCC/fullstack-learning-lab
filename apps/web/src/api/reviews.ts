@@ -1,7 +1,8 @@
+import { requestJson } from './http';
+
 export const DEMO_REVIEW_ITEM_ID = 'review-progress-plan';
 
 const bidderId = 'demo-bidder';
-const expertId = 'demo-expert';
 
 export interface ReviewDetail {
   reviewItem: {
@@ -18,31 +19,14 @@ export interface ReviewDetail {
   } | null;
 }
 
-interface ApiError {
-  code?: string;
-  message?: string;
-}
-
-async function readJson(response: Response): Promise<ReviewDetail> {
-  const data = await response.json() as ReviewDetail & ApiError;
-  if (!response.ok) {
-    const code = data.code ? `[${data.code}] ` : '';
-    throw new Error(`${code}${data.message || `请求失败：${response.status}`}`);
-  }
-  return data;
-}
-
 export async function fetchReviewDetail(): Promise<ReviewDetail> {
-  const query = new URLSearchParams({ bidderId, expertId });
-  const response = await fetch(`/api/review-items/${DEMO_REVIEW_ITEM_ID}?${query}`);
-  return readJson(response);
+  const query = new URLSearchParams({ bidderId });
+  return requestJson<ReviewDetail>(`/api/review-items/${DEMO_REVIEW_ITEM_ID}?${query}`);
 }
 
 export async function saveExpertScore(score: number, feedback: string): Promise<ReviewDetail> {
-  const response = await fetch(`/api/review-items/${DEMO_REVIEW_ITEM_ID}/score`, {
+  return requestJson<ReviewDetail>(`/api/review-items/${DEMO_REVIEW_ITEM_ID}/score`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ bidderId, expertId, score, feedback }),
+    body: JSON.stringify({ bidderId, score, feedback }),
   });
-  return readJson(response);
 }

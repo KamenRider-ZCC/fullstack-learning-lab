@@ -4,7 +4,11 @@ import type { ReviewDetail } from '../api/reviews';
 
 type MessageTone = 'success' | 'error';
 
-export function ReviewScoreCard() {
+interface ReviewScoreCardProps {
+  canScore: boolean;
+}
+
+export function ReviewScoreCard({ canScore }: ReviewScoreCardProps) {
   const [detail, setDetail] = useState<ReviewDetail | null>(null);
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -72,7 +76,7 @@ export function ReviewScoreCard() {
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-violet-300">第 3 课 · 参数校验与错误处理</p>
+          <p className="text-sm font-semibold text-violet-300">第 4 课 · 已认证专家评分</p>
           <h2 className="mt-2 text-2xl font-semibold">{detail.reviewItem.title}</h2>
           <p className="mt-2 max-w-3xl leading-7 text-slate-400">{detail.reviewItem.description}</p>
         </div>
@@ -91,6 +95,7 @@ export function ReviewScoreCard() {
             step="0.5"
             type="number"
             value={score}
+            disabled={!canScore}
             onChange={(event) => setScore(event.target.value)}
           />
         </label>
@@ -98,6 +103,7 @@ export function ReviewScoreCard() {
           评分说明
           <input
             className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 outline-none focus:border-sky-500"
+            disabled={!canScore}
             placeholder="可选"
             value={feedback}
             onChange={(event) => setFeedback(event.target.value)}
@@ -108,11 +114,11 @@ export function ReviewScoreCard() {
       <div className="mt-5 flex flex-wrap items-center gap-4">
         <button
           className="rounded-lg bg-violet-500 px-4 py-2 font-semibold transition hover:bg-violet-400 disabled:cursor-wait disabled:opacity-60"
-          disabled={saving}
+          disabled={saving || !canScore}
           type="button"
           onClick={() => void handleSave()}
         >
-          {saving ? '保存中……' : '保存到数据库'}
+          {!canScore ? '当前角色不可评分' : saving ? '保存中……' : '保存到数据库'}
         </button>
         {detail.score && (
           <span className="text-xs text-slate-500">
@@ -120,6 +126,11 @@ export function ReviewScoreCard() {
           </span>
         )}
       </div>
+      {!canScore && (
+        <p className="mt-4 text-sm text-amber-300">
+          页面已禁用评分操作；后端 RolesGuard 也会拒绝该角色直接调用评分接口。
+        </p>
+      )}
       {message && (
         <p className={`mt-4 text-sm ${messageTone === 'success' ? 'text-emerald-300' : 'text-rose-300'}`}>
           {message}

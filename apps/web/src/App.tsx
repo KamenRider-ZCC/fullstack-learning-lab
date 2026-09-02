@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
+import { fetchCurrentUser, hasStoredSession, logout } from './api/auth';
+import type { AuthUser } from './api/auth';
 import { fetchHealth } from './api/health';
 import type { HealthResponse } from './api/health';
+import { LoginCard } from './components/LoginCard';
 import { ReviewScoreCard } from './components/ReviewScoreCard';
 
 type RequestState = 'idle' | 'loading' | 'success' | 'error';
@@ -16,6 +19,8 @@ export default function App() {
   const [state, setState] = useState<RequestState>('idle');
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [error, setError] = useState('');
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const loadHealth = useCallback(async () => {
     setState('loading');
@@ -35,13 +40,29 @@ export default function App() {
     void loadHealth();
   }, [loadHealth]);
 
+  useEffect(() => {
+    if (!hasStoredSession()) {
+      setSessionLoading(false);
+      return;
+    }
+    void fetchCurrentUser()
+      .then(setUser)
+      .catch(() => logout())
+      .finally(() => setSessionLoading(false));
+  }, []);
+
+  function handleLogout() {
+    logout();
+    setUser(null);
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 px-5 py-12 text-slate-100">
       <div className="mx-auto max-w-5xl">
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">
           Fullstack Learning Lab
         </p>
-        <h1 className="text-3xl font-bold sm:text-4xl">从 HTTP 请求走到可靠的数据写入</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">从登录身份走到接口权限</h1>
         <p className="mt-4 max-w-3xl leading-7 text-slate-400">
           这个页面不是读取前端假数据。它会经过 Vite 开发代理，请求运行在 3000 端口的 NestJS API。
         </p>
@@ -94,12 +115,33 @@ export default function App() {
           </div>
         </section>
 
-        <ReviewScoreCard />
+        {sessionLoading ? (
+          <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6 text-slate-400">
+            正在检查登录状态……
+          </section>
+        ) : user ? (
+          <>
+            <section className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-800 bg-slate-900 p-5">
+              <div>
+                <p className="text-sm text-emerald-300">已通过 JWT 确认身份</p>
+                <p className="mt-1 font-semibold">
+                  {user.displayName} · {user.role === 'EXPERT' ? '专家角色' : '只读角色'}
+                </p>
+              </div>
+              <button className="rounded-lg border border-slate-700 px-4 py-2" type="button" onClick={handleLogout}>
+                退出登录
+              </button>
+            </section>
+            <ReviewScoreCard canScore={user.role === 'EXPERT'} />
+          </>
+        ) : (
+          <LoginCard onLogin={setUser} />
+        )}
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-xl font-semibold">第 3 课练习</h2>
+          <h2 className="text-xl font-semibold">第 4 课练习</h2>
           <p className="mt-3 leading-7 text-slate-400">
-            分别尝试保存 3.5、4.5 和 3.2 分，观察成功响应以及后端返回的两种业务错误码。
+            分别用专家和查看账号登录，观察两种角色的页面差异；退出后确认评审接口不再可访问。
           </p>
         </section>
       </div>
