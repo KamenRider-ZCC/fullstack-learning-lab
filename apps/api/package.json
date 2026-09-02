@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "tsx watch src/main.ts",
+    "dev": "tsc-watch --onSuccess \"node dist/main.js\"",
     "build": "tsc -p tsconfig.json",
     "check": "tsc --noEmit",
     "start": "node dist/main.js",
@@ -16,6 +16,8 @@
     "@nestjs/core": "^11.0.11",
     "@nestjs/platform-express": "^11.0.11",
     "@prisma/client": "6.19.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
     "dotenv": "^16.4.7",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
@@ -23,7 +25,7 @@
   "devDependencies": {
     "@types/node": "^22.13.4",
     "prisma": "6.19.0",
-    "tsx": "^4.19.3",
+    "tsc-watch": "^7.2.1",
     "typescript": "^5.7.3"
   }
 }

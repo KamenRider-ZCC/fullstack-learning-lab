@@ -12,10 +12,3 @@ export interface ReviewDetailResponse {
     updatedAt: string;
   } | null;
 }
-
-export interface SaveScoreBody {
-  bidderId?: unknown;
-  expertId?: unknown;
-  score?: unknown;
-  feedback?: unknown;
-}

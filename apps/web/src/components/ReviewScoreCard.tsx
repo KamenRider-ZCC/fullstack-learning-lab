@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { fetchReviewDetail, saveExpertScore } from '../api/reviews';
 import type { ReviewDetail } from '../api/reviews';
 
+type MessageTone = 'success' | 'error';
+
 export function ReviewScoreCard() {
   const [detail, setDetail] = useState<ReviewDetail | null>(null);
   const [score, setScore] = useState('');
@@ -9,6 +11,7 @@ export function ReviewScoreCard() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [messageTone, setMessageTone] = useState<MessageTone>('success');
 
   const loadDetail = useCallback(async () => {
     setLoading(true);
@@ -19,6 +22,7 @@ export function ReviewScoreCard() {
       setScore(data.score ? String(data.score.score) : '');
       setFeedback(data.score?.feedback || '');
     } catch (error) {
+      setMessageTone('error');
       setMessage(error instanceof Error ? error.message : '读取失败');
     } finally {
       setLoading(false);
@@ -32,6 +36,7 @@ export function ReviewScoreCard() {
   async function handleSave() {
     const numericScore = Number(score);
     if (!score.trim() || Number.isNaN(numericScore)) {
+      setMessageTone('error');
       setMessage('请输入有效分数');
       return;
     }
@@ -40,8 +45,10 @@ export function ReviewScoreCard() {
     try {
       const data = await saveExpertScore(numericScore, feedback.trim());
       setDetail(data);
+      setMessageTone('success');
       setMessage('保存成功。现在刷新页面，分数仍会从数据库读取。');
     } catch (error) {
+      setMessageTone('error');
       setMessage(error instanceof Error ? error.message : '保存失败');
     } finally {
       setSaving(false);
@@ -65,7 +72,7 @@ export function ReviewScoreCard() {
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-violet-300">第 2 课 · PostgreSQL 持久化</p>
+          <p className="text-sm font-semibold text-violet-300">第 3 课 · 参数校验与错误处理</p>
           <h2 className="mt-2 text-2xl font-semibold">{detail.reviewItem.title}</h2>
           <p className="mt-2 max-w-3xl leading-7 text-slate-400">{detail.reviewItem.description}</p>
         </div>
@@ -113,7 +120,11 @@ export function ReviewScoreCard() {
           </span>
         )}
       </div>
-      {message && <p className="mt-4 text-sm text-emerald-300">{message}</p>}
+      {message && (
+        <p className={`mt-4 text-sm ${messageTone === 'success' ? 'text-emerald-300' : 'text-rose-300'}`}>
+          {message}
+        </p>
+      )}
     </section>
   );
 }

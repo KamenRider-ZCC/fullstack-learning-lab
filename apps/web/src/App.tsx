@@ -41,7 +41,7 @@ export default function App() {
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">
           Fullstack Learning Lab
         </p>
-        <h1 className="text-3xl font-bold sm:text-4xl">从 HTTP 请求走到数据库持久化</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">从 HTTP 请求走到可靠的数据写入</h1>
         <p className="mt-4 max-w-3xl leading-7 text-slate-400">
           这个页面不是读取前端假数据。它会经过 Vite 开发代理，请求运行在 3000 端口的 NestJS API。
         </p>
@@ -97,9 +97,9 @@ export default function App() {
         <ReviewScoreCard />
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-xl font-semibold">第 2 课练习</h2>
+          <h2 className="text-xl font-semibold">第 3 课练习</h2>
           <p className="mt-3 leading-7 text-slate-400">
-            保存一个分数并刷新页面，确认数据仍存在；然后查看 Prisma Studio，找到这条记录对应的数据库行。
+            分别尝试保存 3.5、4.5 和 3.2 分，观察成功响应以及后端返回的两种业务错误码。
           </p>
         </section>
       </div>

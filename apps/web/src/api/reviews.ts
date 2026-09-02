@@ -18,9 +18,17 @@ export interface ReviewDetail {
   } | null;
 }
 
+interface ApiError {
+  code?: string;
+  message?: string;
+}
+
 async function readJson(response: Response): Promise<ReviewDetail> {
-  const data = await response.json() as ReviewDetail & { message?: string };
-  if (!response.ok) throw new Error(data.message || `请求失败：${response.status}`);
+  const data = await response.json() as ReviewDetail & ApiError;
+  if (!response.ok) {
+    const code = data.code ? `[${data.code}] ` : '';
+    throw new Error(`${code}${data.message || `请求失败：${response.status}`}`);
+  }
   return data;
 }
 

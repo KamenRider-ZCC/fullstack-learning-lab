@@ -10,6 +10,7 @@
 
 - 第 1 课：浏览器调用后端健康检查接口。
 - 第 2 课：使用 PostgreSQL 和 Prisma 查询、保存专家评分。
+- 第 3 课：使用 DTO 校验参数，并统一 API 错误格式。
 
 ## 启动
 
@@ -34,10 +35,10 @@ pnpm dev
 
 ## 推荐学习方式
 
-1. 先阅读 `docs/01-http-api.md` 和 `docs/02-database-prisma.md`。
-2. 保存一个专家评分并刷新页面，确认数据仍存在。
-3. 执行 `pnpm db:studio`，在网页中查看数据库记录。
-4. 能解释 Controller、Service、Prisma 和 PostgreSQL 的职责后，再进入下一课。
+1. 按顺序阅读 `docs/01-http-api.md`、`docs/02-database-prisma.md` 和 `docs/03-validation-errors.md`。
+2. 在页面依次尝试保存 `3.5`、`4.5` 和 `3.2` 分。
+3. 对照页面上的错误码，找到后端抛出该错误的位置。
+4. 能解释 DTO 校验和业务校验的区别后，再进入下一课。
 
 完整路线见 `docs/roadmap.md`，陌生词汇见 `docs/glossary.md`。
 

@@ -1,6 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Inject, Param, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Put, Query } from '@nestjs/common';
+import { SaveScoreDto } from './dto/save-score.dto.js';
 import { ReviewService } from './review.service.js';
-import type { SaveScoreBody } from './review.types.js';
 
 @Controller('review-items')
 export class ReviewController {
@@ -18,17 +18,8 @@ export class ReviewController {
   @Put(':reviewItemId/score')
   saveScore(
     @Param('reviewItemId') reviewItemId: string,
-    @Body() body: SaveScoreBody,
+    @Body() body: SaveScoreDto,
   ) {
-    if (typeof body.bidderId !== 'string' || typeof body.expertId !== 'string') {
-      throw new BadRequestException('bidderId 和 expertId 必须是字符串');
-    }
-    if (typeof body.score !== 'number' || !Number.isFinite(body.score)) {
-      throw new BadRequestException('score 必须是有效数字');
-    }
-    if (body.feedback != null && typeof body.feedback !== 'string') {
-      throw new BadRequestException('feedback 必须是字符串');
-    }
     return this.reviewService.saveScore(
       reviewItemId,
       body.bidderId,

@@ -42,10 +42,16 @@ export class ReviewService implements OnModuleInit {
   ) {
     const item = await this.findItem(reviewItemId);
     if (score < 0 || score > item.maxScore) {
-      throw new BadRequestException(`分数必须在 0～${item.maxScore} 之间`);
+      throw new BadRequestException({
+        code: 'SCORE_OUT_OF_RANGE',
+        message: `分数必须在 0～${item.maxScore} 之间`,
+      });
     }
     if (Math.round(score * 2) !== score * 2) {
-      throw new BadRequestException('分数必须按 0.5 分递增');
+      throw new BadRequestException({
+        code: 'SCORE_STEP_INVALID',
+        message: '分数必须按 0.5 分递增',
+      });
     }
 
     const savedScore = await this.prisma.expertScore.upsert({
@@ -60,7 +66,12 @@ export class ReviewService implements OnModuleInit {
 
   private async findItem(reviewItemId: string) {
     const item = await this.prisma.reviewItem.findUnique({ where: { id: reviewItemId } });
-    if (!item) throw new NotFoundException('评审项不存在');
+    if (!item) {
+      throw new NotFoundException({
+        code: 'REVIEW_ITEM_NOT_FOUND',
+        message: '评审项不存在',
+      });
+    }
     return item;
   }
 
