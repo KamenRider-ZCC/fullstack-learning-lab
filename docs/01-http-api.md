@@ -28,7 +28,7 @@ React 页面
 - `apps/api/src/health/health.controller.ts`：接收请求。
 - `apps/api/src/health/health.service.ts`：产生响应数据。
 
-Controller 通过构造函数取得 Service，这叫“依赖注入”。项目使用 `tsx` 运行 TypeScript，因此示例用 `@Inject(HealthService)` 明确告诉 NestJS 要注入哪个服务。
+Controller 通过构造函数取得 Service，这叫“依赖注入”。项目使用 TypeScript 编译器运行后端，并用 `@Inject(HealthService)` 明确告诉 NestJS 要注入哪个服务。`@Inject` 不是手动创建 Service，而是声明当前类需要哪项能力。
 
 ## 动手练习
 

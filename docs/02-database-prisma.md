@@ -22,8 +22,9 @@ React 表单
 ```text
 GET /api/review-items/review-progress-plan
     ?bidderId=demo-bidder
-    &expertId=demo-expert
 ```
+
+> 课程演进说明：第 2 课最初由查询参数传递 `expertId`。完成第 4 课后，接口已受 JWT 保护，后端会从已验签的 Token 中取得专家 ID，不能再由前端指定。现在需要先登录，再携带 `Authorization: Bearer <token>` 请求头。
 
 ## 启动数据库
 
@@ -77,6 +78,8 @@ pnpm db:studio
 - `ExpertScore`：保存某位专家对某个投标人的正式评分。
 
 `reviewItemId + bidderId + expertId` 设置了联合唯一约束，因此同一组合只会保留一条当前评分。再次保存使用 `upsert`：没有记录就新增，有记录就更新。
+
+这里的 `expertId` 仍然存在于数据库记录中，但它来自后端确认的登录身份。“数据库需要保存专家 ID”和“允许浏览器提交专家 ID”是两件不同的事。
 
 ## 重点文件
 

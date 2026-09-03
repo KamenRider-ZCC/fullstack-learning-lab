@@ -19,7 +19,10 @@ interface HttpResponse {
 
 const statusCodes: Record<number, string> = {
   [HttpStatus.BAD_REQUEST]: 'BAD_REQUEST',
+  [HttpStatus.UNAUTHORIZED]: 'UNAUTHORIZED',
+  [HttpStatus.FORBIDDEN]: 'FORBIDDEN',
   [HttpStatus.NOT_FOUND]: 'NOT_FOUND',
+  [HttpStatus.PAYLOAD_TOO_LARGE]: 'FILE_TOO_LARGE',
   [HttpStatus.INTERNAL_SERVER_ERROR]: 'INTERNAL_SERVER_ERROR',
 };
 
@@ -76,11 +79,13 @@ export class ApiExceptionFilter implements ExceptionFilter {
         : validationMessages
           ? 'VALIDATION_ERROR'
           : statusCodes[status] || `HTTP_${status}`,
-      message: validationMessages
-        ? '请求参数不合法'
-        : typeof payload.message === 'string'
-          ? payload.message
-          : '请求失败',
+      message: status === HttpStatus.PAYLOAD_TOO_LARGE
+        ? '上传内容过大'
+        : validationMessages
+          ? '请求参数不合法'
+          : typeof payload.message === 'string'
+            ? payload.message
+            : '请求失败',
       details: validationMessages,
     };
   }

@@ -12,6 +12,7 @@
 - 第 2 课：使用 PostgreSQL 和 Prisma 查询、保存专家评分。
 - 第 3 课：使用 DTO 校验参数，并统一 API 错误格式。
 - 第 4 课：使用 JWT 确认用户身份，并按角色保护评分接口。
+- 第 5A 课：上传 PDF，将文件内容与数据库元数据分开保存并鉴权预览。
 
 ## 启动
 
@@ -36,11 +37,11 @@ pnpm dev
 
 ## 推荐学习方式
 
-1. 按顺序阅读 `docs/01-http-api.md` 到 `docs/04-auth-jwt.md`。
+1. 按顺序阅读 `docs/01-http-api.md` 到 `docs/05a-local-file-upload.md`。
 2. 第一次接触 NestJS 或 JWT 时，再阅读 `docs/04b-auth-code-walkthrough.md`。
-3. 分别使用专家账号和查看账号登录。
-4. 在浏览器 Network 面板观察携带 JWT 的请求。
-5. 能解释认证与授权的区别后，再进入下一课。
+3. 使用专家账号上传一个 PDF，并在 Prisma Studio 查看 `Document` 元数据。
+4. 使用查看账号完成一次鉴权预览。
+5. 能解释文件内容与元数据为什么分开保存后，再进入下一课。
 
 完整路线见 `docs/roadmap.md`，陌生词汇见 `docs/glossary.md`。
 

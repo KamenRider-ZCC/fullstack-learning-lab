@@ -58,17 +58,27 @@ pnpm dev
 再用 PowerShell 发送一个字段类型错误的请求：
 
 ```powershell
-$body = @{ bidderId = 'demo-bidder'; expertId = 'demo-expert'; score = '三分' } |
+$loginBody = @{ username = 'expert'; password = 'demo123456' } | ConvertTo-Json
+$login = Invoke-RestMethod `
+  -Uri 'http://127.0.0.1:3000/api/auth/login' `
+  -Method Post `
+  -ContentType 'application/json' `
+  -Body $loginBody
+
+$headers = @{ Authorization = "Bearer $($login.accessToken)" }
+$body = @{ bidderId = 'demo-bidder'; score = '三分' } |
   ConvertTo-Json
 
-Invoke-RestMethod `
+Invoke-WebRequest `
+  -SkipHttpErrorCheck `
   -Uri 'http://127.0.0.1:3000/api/review-items/review-progress-plan/score' `
   -Method Put `
+  -Headers $headers `
   -ContentType 'application/json' `
   -Body $body
 ```
 
-PowerShell 会显示 HTTP 400；响应体中的错误码是 `VALIDATION_ERROR`，数据库不会写入这次请求。
+PowerShell 会显示 HTTP 400；响应体中的错误码是 `VALIDATION_ERROR`，数据库不会写入这次请求。这里先登录是因为完成第 4 课后，评分接口会在 DTO 校验前进行身份认证。
 
 ## 重点文件
 

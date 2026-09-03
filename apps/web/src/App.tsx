@@ -4,6 +4,7 @@ import type { AuthUser } from './api/auth';
 import { fetchHealth } from './api/health';
 import type { HealthResponse } from './api/health';
 import { LoginCard } from './components/LoginCard';
+import { DocumentPanel } from './components/DocumentPanel';
 import { ReviewScoreCard } from './components/ReviewScoreCard';
 
 type RequestState = 'idle' | 'loading' | 'success' | 'error';
@@ -62,7 +63,7 @@ export default function App() {
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">
           Fullstack Learning Lab
         </p>
-        <h1 className="text-3xl font-bold sm:text-4xl">从登录身份走到接口权限</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">从文件上传走到鉴权预览</h1>
         <p className="mt-4 max-w-3xl leading-7 text-slate-400">
           这个页面不是读取前端假数据。它会经过 Vite 开发代理，请求运行在 3000 端口的 NestJS API。
         </p>
@@ -133,15 +134,16 @@ export default function App() {
               </button>
             </section>
             <ReviewScoreCard canScore={user.role === 'EXPERT'} />
+            <DocumentPanel canUpload={user.role === 'EXPERT'} />
           </>
         ) : (
           <LoginCard onLogin={setUser} />
         )}
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-xl font-semibold">第 4 课练习</h2>
+          <h2 className="text-xl font-semibold">第 5A 课练习</h2>
           <p className="mt-3 leading-7 text-slate-400">
-            分别用专家和查看账号登录，观察两种角色的页面差异；退出后确认评审接口不再可访问。
+            使用专家账号上传 PDF，观察数据库只保存元数据；再用查看账号登录并完成鉴权预览。
           </p>
         </section>
       </div>
