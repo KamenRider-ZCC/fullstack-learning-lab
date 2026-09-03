@@ -69,7 +69,7 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
       setDocuments((current) => [document, ...current]);
       setSelectedFile(null);
       setFileInputKey((current) => current + 1);
-      setMessage({ tone: 'success', text: '文件内容和数据库元数据均已保存' });
+      setMessage({ tone: 'success', text: 'PDF 已保存到 MinIO，元数据已保存到 PostgreSQL' });
     } catch (error) {
       setMessage({
         tone: 'error',
@@ -99,10 +99,10 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
 
   return (
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <p className="text-sm font-semibold text-cyan-300">第 5A 课 · 普通文件上传</p>
-      <h2 className="mt-2 text-2xl font-semibold">投标文件与元数据</h2>
+      <p className="text-sm font-semibold text-cyan-300">第 5B 课 · MinIO 对象存储</p>
+      <h2 className="mt-2 text-2xl font-semibold">投标文件、对象存储与元数据</h2>
       <p className="mt-2 leading-7 text-slate-400">
-        PDF 内容保存在后端本地目录，文件名、大小和上传者保存在 PostgreSQL。单个文件上限 10 MB。
+        PDF 内容保存在 MinIO，文件名、对象键、大小和上传者保存在 PostgreSQL。单个文件上限 10 MB。
       </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">

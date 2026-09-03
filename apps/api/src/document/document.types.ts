@@ -1,3 +1,5 @@
+import type { Readable } from 'node:stream';
+
 export interface DocumentSummary {
   id: string;
   originalName: string;
@@ -11,7 +13,7 @@ export interface DocumentSummary {
 }
 
 export interface DocumentContent {
-  filePath: string;
+  stream: Readable;
   originalName: string;
   mimeType: string;
   size: number;

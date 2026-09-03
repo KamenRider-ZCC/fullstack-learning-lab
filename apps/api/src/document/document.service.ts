@@ -6,8 +6,10 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MAX_UPLOAD_BYTES, PDF_MIME_TYPE } from './document.constants.js';
+import { normalizeMultipartFilename } from './document-filename.js';
 import type { DocumentContent, DocumentSummary } from './document.types.js';
-import { LocalFileStorageService } from './local-file-storage.service.js';
+import { FILE_STORAGE } from './file-storage.port.js';
+import type { FileStoragePort } from './file-storage.port.js';
 
 const documentInclude = {
   uploadedBy: { select: { id: true, displayName: true } },
@@ -17,8 +19,7 @@ const documentInclude = {
 export class DocumentService {
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
-    @Inject(LocalFileStorageService)
-    private readonly storage: LocalFileStorageService,
+    @Inject(FILE_STORAGE) private readonly storage: FileStoragePort,
   ) {}
 
   async list(): Promise<DocumentSummary[]> {
@@ -39,7 +40,7 @@ export class DocumentService {
     try {
       const document = await this.prisma.document.create({
         data: {
-          originalName: file.originalname,
+          originalName: normalizeMultipartFilename(file.originalname),
           storageKey,
           mimeType: PDF_MIME_TYPE,
           size: file.size,
@@ -67,7 +68,7 @@ export class DocumentService {
     }
 
     return {
-      filePath: await this.storage.getFilePath(document.storageKey),
+      stream: await this.storage.getObject(document.storageKey),
       originalName: document.originalName,
       mimeType: document.mimeType,
       size: document.size,

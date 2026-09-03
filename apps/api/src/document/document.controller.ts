@@ -11,7 +11,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createReadStream } from 'node:fs';
 import type { Response } from 'express';
 import { CurrentUser } from '../auth/current-user.decorator.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -57,7 +56,7 @@ export class DocumentController {
     response.setHeader('Content-Length', document.size);
     response.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodedName}`);
     response.setHeader('Cache-Control', 'private, no-store');
-    // 使用流逐段发送文件，避免预览时再次把整个 PDF 读入内存。
-    return new StreamableFile(createReadStream(document.filePath));
+    // MinIO 返回可读流，后端无需把整个 PDF 再加载进内存。
+    return new StreamableFile(document.stream);
   }
 }

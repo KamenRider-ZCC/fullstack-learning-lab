@@ -11,6 +11,9 @@
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres",
     "db:migrate": "pnpm --filter @fullstack-lab/api run db:migrate",
-    "db:studio": "pnpm --filter @fullstack-lab/api run db:studio"
+    "db:studio": "pnpm --filter @fullstack-lab/api run db:studio",
+    "infra:up": "docker compose up -d postgres minio",
+    "infra:down": "docker compose down",
+    "storage:migrate-local": "pnpm --filter @fullstack-lab/api run storage:migrate-local"
   }
 }

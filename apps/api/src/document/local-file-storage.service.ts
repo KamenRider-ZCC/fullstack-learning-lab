@@ -1,10 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { createReadStream } from 'node:fs';
 import { access, mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
+import type { FileStoragePort } from './file-storage.port.js';
 
 @Injectable()
-export class LocalFileStorageService implements OnModuleInit {
+export class LocalFileStorageService implements OnModuleInit, FileStoragePort {
   private readonly uploadDirectory = resolve(
     process.env.UPLOAD_DIR || 'storage/uploads',
   );
@@ -23,6 +25,10 @@ export class LocalFileStorageService implements OnModuleInit {
     const filePath = this.resolveStorageKey(storageKey);
     await access(filePath);
     return filePath;
+  }
+
+  async getObject(storageKey: string) {
+    return createReadStream(await this.getFilePath(storageKey));
   }
 
   async remove(storageKey: string) {
