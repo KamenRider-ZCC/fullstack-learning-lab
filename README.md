@@ -37,9 +37,10 @@ pnpm dev
 ## 推荐学习方式
 
 1. 按顺序阅读 `docs/01-http-api.md` 到 `docs/04-auth-jwt.md`。
-2. 分别使用专家账号和查看账号登录。
-3. 在浏览器 Network 面板观察携带 JWT 的请求。
-4. 能解释认证与授权的区别后，再进入下一课。
+2. 第一次接触 NestJS 或 JWT 时，再阅读 `docs/04b-auth-code-walkthrough.md`。
+3. 分别使用专家账号和查看账号登录。
+4. 在浏览器 Network 面板观察携带 JWT 的请求。
+5. 能解释认证与授权的区别后，再进入下一课。
 
 完整路线见 `docs/roadmap.md`，陌生词汇见 `docs/glossary.md`。
 

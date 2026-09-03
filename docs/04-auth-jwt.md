@@ -1,5 +1,7 @@
 # 第 4 课：登录、JWT 鉴权与角色权限
 
+第一次接触 NestJS、ValidationPipe、JWT 或 Prisma 时，请在完成本讲义后继续阅读 [`04b-auth-code-walkthrough.md`](./04b-auth-code-walkthrough.md)。补充课会按照实际执行顺序逐文件拆解代码。
+
 ## 本课目标
 
 让后端可靠地确定“谁正在评分”，并拒绝未登录用户和没有专家角色的用户。
