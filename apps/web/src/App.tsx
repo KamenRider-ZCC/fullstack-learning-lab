@@ -141,9 +141,9 @@ export default function App() {
         )}
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-xl font-semibold">第 6A 课练习</h2>
+          <h2 className="text-xl font-semibold">第 6B 课练习</h2>
           <p className="mt-3 leading-7 text-slate-400">
-            运行 pnpm test，阅读 20 个用例的名称；再故意改错一个断言，观察 Vitest 如何定位失败。
+            运行 pnpm test:integration，观察测试基础设施启动、迁移、真实 HTTP 验证和自动清理四个阶段。
           </p>
         </section>
       </div>

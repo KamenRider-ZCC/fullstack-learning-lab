@@ -9,6 +9,8 @@
     "check": "pnpm --filter @fullstack-lab/api --filter @fullstack-lab/web run check",
     "test": "pnpm --filter @fullstack-lab/api run test",
     "test:watch": "pnpm --filter @fullstack-lab/api run test:watch",
+    "test:integration": "node apps/api/scripts/run-integration-tests.mjs",
+    "test:all": "pnpm test && pnpm test:integration",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose stop postgres",
     "db:logs": "docker compose logs -f postgres",
