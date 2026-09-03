@@ -63,7 +63,7 @@ export default function App() {
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">
           Fullstack Learning Lab
         </p>
-        <h1 className="text-3xl font-bold sm:text-4xl">从文件上传走到对象存储</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">从对象存储走到安全直连预览</h1>
         <p className="mt-4 max-w-3xl leading-7 text-slate-400">
           这个页面不是读取前端假数据。它会经过 Vite 开发代理，请求运行在 3000 端口的 NestJS API。
         </p>
@@ -141,9 +141,9 @@ export default function App() {
         )}
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-xl font-semibold">第 5B 课练习</h2>
+          <h2 className="text-xl font-semibold">第 5C 课练习</h2>
           <p className="mt-3 leading-7 text-slate-400">
-            使用专家账号上传 PDF，在 MinIO Console 观察对象；再查看 PostgreSQL 元数据并完成鉴权预览。
+            生成临时预览地址，观察 URL 的过期参数；修改任意签名字符，确认 MinIO 会拒绝访问。
           </p>
         </section>
       </div>

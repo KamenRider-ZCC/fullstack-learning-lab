@@ -18,3 +18,9 @@ export interface DocumentContent {
   mimeType: string;
   size: number;
 }
+
+export interface DocumentPreviewUrl {
+  url: string;
+  expiresAt: string;
+  expiresInSeconds: number;
+}

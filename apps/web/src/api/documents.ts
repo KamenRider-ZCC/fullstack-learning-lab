@@ -12,6 +12,12 @@ export interface DocumentSummary {
   };
 }
 
+export interface DocumentPreviewUrl {
+  url: string;
+  expiresAt: string;
+  expiresInSeconds: number;
+}
+
 export function fetchDocuments() {
   return requestJson<DocumentSummary[]>('/api/documents');
 }
@@ -27,4 +33,10 @@ export function uploadDocument(file: File) {
 
 export function fetchDocumentContent(documentId: string) {
   return requestBlob(`/api/documents/${documentId}/content`);
+}
+
+export function fetchDocumentPreviewUrl(documentId: string) {
+  return requestJson<DocumentPreviewUrl>(
+    `/api/documents/${documentId}/preview-url`,
+  );
 }

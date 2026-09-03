@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import {
-  fetchDocumentContent,
+  fetchDocumentPreviewUrl,
   fetchDocuments,
   uploadDocument,
 } from '../api/documents';
@@ -26,6 +26,7 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
   const [previewLoadingId, setPreviewLoadingId] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
   const [previewName, setPreviewName] = useState('');
+  const [previewExpiresAt, setPreviewExpiresAt] = useState('');
   const [message, setMessage] = useState<Message>(null);
 
   const loadDocuments = useCallback(async () => {
@@ -45,12 +46,6 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
   useEffect(() => {
     void loadDocuments();
   }, [loadDocuments]);
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     setSelectedFile(event.target.files?.[0] || null);
@@ -84,9 +79,10 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
     setPreviewLoadingId(document.id);
     setMessage(null);
     try {
-      const blob = await fetchDocumentContent(document.id);
+      const preview = await fetchDocumentPreviewUrl(document.id);
       setPreviewName(document.originalName);
-      setPreviewUrl(URL.createObjectURL(blob));
+      setPreviewUrl(preview.url);
+      setPreviewExpiresAt(preview.expiresAt);
     } catch (error) {
       setMessage({
         tone: 'error',
@@ -99,10 +95,10 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
 
   return (
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <p className="text-sm font-semibold text-cyan-300">第 5B 课 · MinIO 对象存储</p>
-      <h2 className="mt-2 text-2xl font-semibold">投标文件、对象存储与元数据</h2>
+      <p className="text-sm font-semibold text-cyan-300">第 5C 课 · 短期签名 URL</p>
+      <h2 className="mt-2 text-2xl font-semibold">鉴权后直连 MinIO 预览</h2>
       <p className="mt-2 leading-7 text-slate-400">
-        PDF 内容保存在 MinIO，文件名、对象键、大小和上传者保存在 PostgreSQL。单个文件上限 10 MB。
+        后端先检查 JWT，再签发 5 分钟有效的预览地址；浏览器随后直接从 MinIO 读取 PDF。
       </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -152,7 +148,7 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
                   type="button"
                   onClick={() => void handlePreview(document)}
                 >
-                  {previewLoadingId === document.id ? '读取中……' : '鉴权预览'}
+                  {previewLoadingId === document.id ? '生成中……' : '生成临时地址并预览'}
                 </button>
               </li>
             ))}
@@ -168,6 +164,9 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
               关闭预览
             </button>
           </div>
+          <p className="mb-3 text-xs text-amber-300">
+            此地址将在 {new Date(previewExpiresAt).toLocaleTimeString()} 失效；重新打开会生成新地址。
+          </p>
           <iframe className="h-[600px] w-full rounded-xl bg-white" src={previewUrl} title={previewName} />
         </div>
       )}

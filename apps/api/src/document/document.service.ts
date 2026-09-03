@@ -7,9 +7,16 @@ import {
 import { PrismaService } from '../prisma/prisma.service.js';
 import { MAX_UPLOAD_BYTES, PDF_MIME_TYPE } from './document.constants.js';
 import { normalizeMultipartFilename } from './document-filename.js';
-import type { DocumentContent, DocumentSummary } from './document.types.js';
+import type {
+  DocumentContent,
+  DocumentPreviewUrl,
+  DocumentSummary,
+} from './document.types.js';
 import { FILE_STORAGE } from './file-storage.port.js';
 import type { FileStoragePort } from './file-storage.port.js';
+import { readPreviewUrlTtlSeconds } from './preview-url.config.js';
+import { TEMPORARY_FILE_URL } from './temporary-file-url.port.js';
+import type { TemporaryFileUrlPort } from './temporary-file-url.port.js';
 
 const documentInclude = {
   uploadedBy: { select: { id: true, displayName: true } },
@@ -17,9 +24,13 @@ const documentInclude = {
 
 @Injectable()
 export class DocumentService {
+  private readonly previewUrlTtlSeconds = readPreviewUrlTtlSeconds();
+
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(FILE_STORAGE) private readonly storage: FileStoragePort,
+    @Inject(TEMPORARY_FILE_URL)
+    private readonly temporaryUrl: TemporaryFileUrlPort,
   ) {}
 
   async list(): Promise<DocumentSummary[]> {
@@ -57,6 +68,32 @@ export class DocumentService {
   }
 
   async getContent(documentId: string): Promise<DocumentContent> {
+    const document = await this.findDocumentOrThrow(documentId);
+
+    return {
+      stream: await this.storage.getObject(document.storageKey),
+      originalName: document.originalName,
+      mimeType: document.mimeType,
+      size: document.size,
+    };
+  }
+
+  async createPreviewUrl(documentId: string): Promise<DocumentPreviewUrl> {
+    const document = await this.findDocumentOrThrow(documentId);
+    const expiresInSeconds = this.previewUrlTtlSeconds;
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000).toISOString();
+    const url = await this.temporaryUrl.createTemporaryReadUrl(
+      document.storageKey,
+      {
+        expiresInSeconds,
+        originalName: document.originalName,
+        mimeType: document.mimeType,
+      },
+    );
+    return { url, expiresAt, expiresInSeconds };
+  }
+
+  private async findDocumentOrThrow(documentId: string) {
     const document = await this.prisma.document.findUnique({
       where: { id: documentId },
     });
@@ -66,13 +103,7 @@ export class DocumentService {
         message: '文件记录不存在',
       });
     }
-
-    return {
-      stream: await this.storage.getObject(document.storageKey),
-      originalName: document.originalName,
-      mimeType: document.mimeType,
-      size: document.size,
-    };
+    return document;
   }
 
   private validatePdf(file?: Express.Multer.File): asserts file is Express.Multer.File {

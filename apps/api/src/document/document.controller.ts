@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Header,
   Inject,
   Param,
   Post,
@@ -58,5 +59,11 @@ export class DocumentController {
     response.setHeader('Cache-Control', 'private, no-store');
     // MinIO 返回可读流，后端无需把整个 PDF 再加载进内存。
     return new StreamableFile(document.stream);
+  }
+
+  @Get(':documentId/preview-url')
+  @Header('Cache-Control', 'private, no-store')
+  createPreviewUrl(@Param('documentId') documentId: string) {
+    return this.documentService.createPreviewUrl(documentId);
   }
 }

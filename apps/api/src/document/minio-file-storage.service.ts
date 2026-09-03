@@ -4,9 +4,14 @@ import { randomUUID } from 'node:crypto';
 import { PDF_MIME_TYPE } from './document.constants.js';
 import type { FileStoragePort } from './file-storage.port.js';
 import { readMinioConfig } from './minio.config.js';
+import type {
+  TemporaryFileUrlPort,
+  TemporaryReadUrlOptions,
+} from './temporary-file-url.port.js';
 
 @Injectable()
-export class MinioFileStorageService implements OnModuleInit, FileStoragePort {
+export class MinioFileStorageService
+  implements OnModuleInit, FileStoragePort, TemporaryFileUrlPort {
   private readonly config = readMinioConfig();
   private readonly client = new Client({
     endPoint: this.config.endPoint,
@@ -14,6 +19,13 @@ export class MinioFileStorageService implements OnModuleInit, FileStoragePort {
     useSSL: this.config.useSSL,
     accessKey: this.config.accessKey,
     secretKey: this.config.secretKey,
+    region: this.config.region,
+  });
+  private readonly publicUrlClient = new Client({
+    ...this.config.publicEndpoint,
+    accessKey: this.config.accessKey,
+    secretKey: this.config.secretKey,
+    region: this.config.region,
   });
 
   async onModuleInit() {
@@ -39,6 +51,23 @@ export class MinioFileStorageService implements OnModuleInit, FileStoragePort {
 
   async remove(storageKey: string) {
     await this.client.removeObject(this.config.bucket, storageKey);
+  }
+
+  async createTemporaryReadUrl(
+    storageKey: string,
+    options: TemporaryReadUrlOptions,
+  ) {
+    const encodedName = encodeURIComponent(options.originalName);
+    return this.publicUrlClient.presignedGetObject(
+      this.config.bucket,
+      storageKey,
+      options.expiresInSeconds,
+      {
+        'response-content-type': options.mimeType,
+        'response-content-disposition': `inline; filename*=UTF-8''${encodedName}`,
+        'response-cache-control': 'private, no-store',
+      },
+    );
   }
 
   private async ensureBucket() {
