@@ -7,6 +7,8 @@
     "dev": "pnpm --stream --parallel --filter @fullstack-lab/api --filter @fullstack-lab/web run dev",
     "build": "pnpm --filter @fullstack-lab/api --filter @fullstack-lab/web run build",
     "check": "pnpm --filter @fullstack-lab/api --filter @fullstack-lab/web run check",
+    "test": "pnpm --filter @fullstack-lab/api run test",
+    "test:watch": "pnpm --filter @fullstack-lab/api run test:watch",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose stop postgres",
     "db:logs": "docker compose logs -f postgres",

@@ -141,9 +141,9 @@ export default function App() {
         )}
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-xl font-semibold">第 5C 课练习</h2>
+          <h2 className="text-xl font-semibold">第 6A 课练习</h2>
           <p className="mt-3 leading-7 text-slate-400">
-            生成临时预览地址，观察 URL 的过期参数；修改任意签名字符，确认 MinIO 会拒绝访问。
+            运行 pnpm test，阅读 20 个用例的名称；再故意改错一个断言，观察 Vitest 如何定位失败。
           </p>
         </section>
       </div>

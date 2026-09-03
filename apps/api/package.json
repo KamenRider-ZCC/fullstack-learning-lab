@@ -3,14 +3,16 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"node dist/main.js\"",
-    "build": "tsc -p tsconfig.json",
+    "dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/main.js\"",
+    "build": "tsc -p tsconfig.build.json",
     "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "start": "node dist/main.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "storage:migrate-local": "tsc -p tsconfig.json && node dist/scripts/migrate-local-files-to-minio.js"
+    "storage:migrate-local": "tsc -p tsconfig.build.json && node dist/scripts/migrate-local-files-to-minio.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.11",
@@ -26,11 +28,13 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@nestjs/testing": "^11.2.3",
     "@types/express": "^5.0.6",
     "@types/multer": "^2.2.0",
     "@types/node": "^22.13.4",
     "prisma": "6.19.0",
     "tsc-watch": "^7.2.1",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.7"
   }
 }
