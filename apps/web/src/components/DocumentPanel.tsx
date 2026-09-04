@@ -104,6 +104,7 @@ export function DocumentPanel({ canUpload }: DocumentPanelProps) {
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <input
           accept="application/pdf,.pdf"
+          aria-label="选择 PDF 文件"
           className="max-w-full text-sm text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-700 file:px-3 file:py-2 file:text-slate-100"
           disabled={!canUpload || uploading}
           key={fileInputKey}

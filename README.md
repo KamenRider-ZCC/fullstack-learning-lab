@@ -17,7 +17,8 @@
 - 第 5B 课：将 PDF 迁移到 MinIO 对象存储。
 - 第 5C 课：鉴权后生成短期签名 URL，浏览器直连 MinIO 预览。
 - 第 6A 课：使用 Vitest 和 Nest TestingModule 编写后端单元测试。
-- 第 6B 课（当前）：使用隔离的 PostgreSQL 和 MinIO 完成 API 集成测试。
+- 第 6B 课：使用隔离的 PostgreSQL 和 MinIO 完成 API 集成测试。
+- 第 6C 课（当前）：使用 Vitest、jsdom 和 Testing Library 完成 React 组件测试。
 
 ## 一、运行前准备
 
@@ -158,7 +159,7 @@ docker compose config --quiet
 ```
 
 - `check`：只做 TypeScript 类型检查。
-- `test`：运行后端单元测试；第 6A 课的测试不依赖数据库和 MinIO。
+- `test`：运行后端单元测试和前端组件测试；不依赖数据库、MinIO 或真实浏览器。
 - `test:integration`：临时启动隔离测试基础设施，执行真实 API 测试并自动清理。
 - `build`：生成前端和后端生产构建。
 - `docker compose config --quiet`：检查 Compose 配置语法。
@@ -202,6 +203,7 @@ Get-NetTCPConnection -State Listen |
 - 第 5C 课：`docs/05c-presigned-preview-url.md`
 - 第 6A 课：`docs/06a-backend-unit-tests.md`
 - 第 6B 课：`docs/06b-api-integration-tests.md`
+- 第 6C 课：`docs/06c-frontend-component-tests.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 
@@ -210,8 +212,8 @@ Get-NetTCPConnection -State Listen |
 ```powershell
 pnpm dev                   # 同时启动前端和后端
 pnpm check                 # TypeScript 静态检查
-pnpm test                  # 运行一次后端单元测试
-pnpm test:watch            # 监听代码变化并重复运行相关测试
+pnpm test                  # 运行一次后端单元测试和前端组件测试
+pnpm test:watch            # 同时监听前后端代码变化并重复运行相关测试
 pnpm test:integration      # 启动隔离基础设施并运行 API 集成测试
 pnpm test:all              # 依次运行单元测试和 API 集成测试
 pnpm build                 # 生成生产构建
