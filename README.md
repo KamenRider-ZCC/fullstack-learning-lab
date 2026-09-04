@@ -7,6 +7,8 @@
 - 基础设施：PostgreSQL + MinIO + Docker Compose
 - 工程化：GitHub Actions、GHCR、生产 Compose、备份和回滚
 
+如果你以前只做过前端、准备主要借助 AI 学习和开发，请先阅读：`docs/00-ai-fullstack-essential-guide.md`。它说明哪些知识必须亲自理解、哪些工作可以交给 Codex，以及接受 AI 代码前应检查什么。
+
 ## 当前进度
 
 - 第 1 课：HTTP 与前后端联调。
@@ -319,6 +321,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 
 建议按顺序阅读 `docs`：
 
+- AI 全栈必备知识地图：`docs/00-ai-fullstack-essential-guide.md`
 - 第 4 课慢速拆解：`docs/04b-auth-code-walkthrough.md`
 - 第 5A 课：`docs/05a-local-file-upload.md`
 - 第 5B 课：`docs/05b-minio-object-storage.md`
