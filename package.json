@@ -25,6 +25,10 @@
     "https:cert": "node scripts/generate-dev-certificate.mjs",
     "stack:https:up": "docker compose --file compose.yaml --file compose.https.yaml up --build -d",
     "stack:https:down": "docker compose --file compose.yaml --file compose.https.yaml down",
+    "production:config": "docker compose --env-file .env.production --file compose.production.yaml config --quiet",
+    "backup:create": "node scripts/create-backup.mjs",
+    "backup:create:production": "node scripts/create-backup.mjs --production",
+    "backup:verify": "node scripts/verify-backup.mjs",
     "storage:migrate-local": "pnpm --filter @fullstack-lab/api run storage:migrate-local"
   }
 }

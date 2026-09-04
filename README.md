@@ -5,7 +5,7 @@
 - `apps/web`：React + Vite + Tailwind
 - `apps/api`：Node.js + NestJS + Prisma
 - 基础设施：PostgreSQL + MinIO + Docker Compose
-- 后续课程：CI/CD、备份、监控和回滚
+- 工程化：GitHub Actions、GHCR、生产 Compose、备份和回滚
 
 ## 当前进度
 
@@ -20,7 +20,8 @@
 - 第 6B 课：使用隔离的 PostgreSQL 和 MinIO 完成 API 集成测试。
 - 第 6C 课：使用 Vitest、jsdom 和 Testing Library 完成 React 组件测试。
 - 第 7 课：为前后端制作生产镜像，并用 Docker Compose 启动完整系统。
-- 第 8 课（当前）：使用 Nginx 统一入口，学习本地 HTTPS、CSP、CORS 和 iframe 安全边界。
+- 第 8 课：使用 Nginx 统一入口，学习本地 HTTPS、CSP、CORS 和 iframe 安全边界。
+- 第 9 课（当前）：使用 CI 自动检查并发布镜像，学习生产配置、备份和可回滚发布。
 
 ## 一、运行前准备
 
@@ -183,6 +184,43 @@ pnpm stack:https:up
 
 HTTPS 页面中的 PDF 会通过同源 `/storage` 入口转发到 MinIO，不会产生“HTTPS 页面嵌入 HTTP 文件”的混合内容错误。证书和私钥保存在被 Git 忽略的 `.certs`，不能提交或用于正式环境。
 
+### 第 9 课：生产配置、发布和备份
+
+GitHub Actions 配置在 `.github/workflows/ci.yml`：Pull Request 只做检查、测试和构建；代码进入 `master` 或推送 `v*` 标签后，还会把 API、Web 镜像发布到 GHCR。它不会自动连接真实服务器，因此当前属于“自动交付镜像、人工确认上线”。
+
+第一次准备生产服务器时，复制并修改生产环境变量：
+
+```powershell
+Copy-Item .env.production.example .env.production
+```
+
+必须替换示例域名、镜像 SHA 标签、数据库密码、MinIO 密钥、JWT 密钥和证书路径。`.env.production` 含真实密钥，已被 Git 和 Docker 构建忽略。修改后先检查配置，不启动服务：
+
+```powershell
+pnpm production:config
+```
+
+服务器登录 GHCR 后，发布命令是：
+
+```powershell
+docker compose --env-file .env.production --file compose.production.yaml pull
+docker compose --env-file .env.production --file compose.production.yaml up --detach
+docker compose --env-file .env.production --file compose.production.yaml ps
+```
+
+生产配置只公开 Nginx 的 80/443，PostgreSQL、MinIO 和 API 只允许容器网络访问。真实上线前还要由运维准备域名、可信 HTTPS 证书、防火墙和异机备份位置。本课程不会替你连接或修改真实服务器。
+
+本地可对当前开发数据执行一次只读式备份实验：
+
+```powershell
+pnpm backup:create
+pnpm backup:verify
+```
+
+备份位于被 Git 忽略的 `backups/development/<时间戳>`，包括 PostgreSQL 自定义格式归档、MinIO 对象副本和 SHA-256 清单。验证只检查文件与数据库归档是否可读，不会执行恢复。生产环境使用 `pnpm backup:create:production`，要求生产 Compose 正在运行且 `.env.production` 正确。
+
+完整原理、首次上线步骤、回滚演练和注意事项见 `docs/09-ci-cd-backup-rollback.md`。
+
 ## 六、怎么停止
 
 1. 在运行 `pnpm dev` 的终端按 `Ctrl+C`，停止前端和后端。
@@ -218,6 +256,7 @@ pnpm build
 pnpm stack:build
 docker compose config --quiet
 docker compose --file compose.yaml --file compose.https.yaml config --quiet
+docker compose --env-file .env.production.example --file compose.production.yaml config --quiet
 ```
 
 - `check`：只做 TypeScript 类型检查。
@@ -227,6 +266,7 @@ docker compose --file compose.yaml --file compose.https.yaml config --quiet
 - `stack:build`：在 Linux 容器内构建前端和后端生产镜像。
 - `docker compose config --quiet`：检查 Compose 配置语法。
 - 第二条 Compose 命令：检查基础配置与 HTTPS 覆盖配置合并后是否合法。
+- 第三条 Compose 命令：用无真实密钥的示例变量检查生产 Compose 语法。
 
 ## 八、常见启动问题
 
@@ -288,6 +328,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 第 6C 课：`docs/06c-frontend-component-tests.md`
 - 第 7 课：`docs/07-dockerize-full-stack.md`
 - 第 8 课：`docs/08-nginx-https-security.md`
+- 第 9 课：`docs/09-ci-cd-backup-rollback.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 
@@ -310,6 +351,10 @@ pnpm stack:logs            # 持续查看容器化前后端日志
 pnpm https:cert            # 生成被 Git 忽略的本地自签名证书
 pnpm stack:https:up        # 构建并启动 HTTP + HTTPS 学习环境
 pnpm stack:https:down      # 停止 HTTPS 组合环境并保留 Volume
+pnpm production:config     # 使用真实 .env.production 检查生产 Compose
+pnpm backup:create         # 备份当前开发 Compose 的数据库和 MinIO
+pnpm backup:create:production # 备份正在运行的生产 Compose
+pnpm backup:verify         # 校验最近一次备份，不恢复数据
 pnpm db:up                 # 只启动 PostgreSQL
 pnpm db:down               # 只停止 PostgreSQL
 pnpm db:migrate            # 执行 Prisma 数据库迁移

@@ -2,6 +2,8 @@
 .gitignore
 .codex
 .certs
+backups
+.env.production
 node_modules
 **/node_modules
 **/dist

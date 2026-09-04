@@ -6,3 +6,5 @@ dist
 *.log
 apps/api/storage/
 .certs/
+.env.production
+backups/
