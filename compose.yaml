@@ -4,15 +4,15 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: fullstack_lab
-      POSTGRES_USER: fullstack
-      POSTGRES_PASSWORD: fullstack_dev_password
+      POSTGRES_DB: ${POSTGRES_DB:-fullstack_lab}
+      POSTGRES_USER: ${POSTGRES_USER:-fullstack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fullstack_dev_password}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fullstack -d fullstack_lab"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fullstack} -d ${POSTGRES_DB:-fullstack_lab}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -21,13 +21,73 @@ services:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin123
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_API_HOST_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_HOST_PORT:-9001}:9001"
     volumes:
       - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    image: fullstack-learning-lab-api:local
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: "3000"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-fullstack}:${POSTGRES_PASSWORD:-fullstack_dev_password}@postgres:5432/${POSTGRES_DB:-fullstack_lab}?schema=public"
+      JWT_SECRET: ${JWT_SECRET:-local-docker-learning-secret-change-before-production}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      MINIO_BUCKET: ${MINIO_BUCKET:-fullstack-documents}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://127.0.0.1:9000}
+      PREVIEW_URL_TTL_SECONDS: ${PREVIEW_URL_TTL_SECONDS:-300}
+    ports:
+      - "${API_HOST_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    init: true
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+
+  web:
+    image: fullstack-learning-lab-web:local
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "${WEB_HOST_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
 volumes:
   postgres-data:

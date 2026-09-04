@@ -35,17 +35,19 @@
 - 第 5C 课（已完成）：生成短期访问 URL，模拟正式投标文件预览
 - 交付物：有权限的用户可限时预览文件
 
-## 6. 自动化测试（进行中）
+## 6. 自动化测试（已完成）
 
 - 第 6A 课（已完成）：Vitest、Nest TestingModule 和后端单元测试
 - 第 6B 课（已完成）：使用隔离的数据库与 MinIO 完成 API 集成测试
-- 第 6C 课（当前）：使用 jsdom 和 Testing Library 完成前端组件与关键交互测试
+- 第 6C 课（已完成）：使用 jsdom 和 Testing Library 完成前端组件与关键交互测试
 - 交付物：提交代码前可自动发现回归问题
 
-## 7. Docker 化
+## 7. Docker 化（进行中）
 
-- 为前端、后端制作镜像
-- Docker Compose 启动前端、后端、数据库和 MinIO
+- 为前端、后端制作多阶段生产镜像
+- 使用 Nginx 托管前端并反向代理 `/api`
+- Docker Compose 编排前端、后端、数据库和 MinIO
+- 当前：理解镜像、容器、网络、健康检查、迁移和 Volume
 - 交付物：新电脑一条命令运行完整系统
 
 ## 8. Nginx、域名与 HTTPS

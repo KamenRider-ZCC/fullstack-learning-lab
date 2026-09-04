@@ -5,7 +5,7 @@
 - `apps/web`：React + Vite + Tailwind
 - `apps/api`：Node.js + NestJS + Prisma
 - 基础设施：PostgreSQL + MinIO + Docker Compose
-- 后续课程：自动化测试、完整 Docker 化、Nginx、HTTPS 和 CI/CD
+- 后续课程：域名、HTTPS、CI/CD 和运维基础
 
 ## 当前进度
 
@@ -18,7 +18,8 @@
 - 第 5C 课：鉴权后生成短期签名 URL，浏览器直连 MinIO 预览。
 - 第 6A 课：使用 Vitest 和 Nest TestingModule 编写后端单元测试。
 - 第 6B 课：使用隔离的 PostgreSQL 和 MinIO 完成 API 集成测试。
-- 第 6C 课（当前）：使用 Vitest、jsdom 和 Testing Library 完成 React 组件测试。
+- 第 6C 课：使用 Vitest、jsdom 和 Testing Library 完成 React 组件测试。
+- 第 7 课（当前）：为前后端制作生产镜像，并用 Docker Compose 启动完整系统。
 
 ## 一、运行前准备
 
@@ -120,7 +121,8 @@ pnpm dev
 
 | 页面或服务 | 地址 | 用途 |
 | --- | --- | --- |
-| React 页面 | `http://localhost:5173` | 操作完整功能 |
+| React 开发页面 | `http://localhost:5173` | 使用 Vite 开发服务操作完整功能 |
+| Docker 完整页面 | `http://localhost:8080` | 使用 Nginx 访问容器化系统 |
 | API 健康检查 | `http://localhost:3000/api/health` | 确认 NestJS 可访问 |
 | MinIO Console | `http://localhost:9001` | 查看 Bucket 和对象 |
 
@@ -137,10 +139,39 @@ pnpm dev
 
 日常启动不需要重复安装依赖、迁移数据库或迁移旧文件，除非依赖、数据库结构或课程说明发生了变化。
 
-## 五、怎么停止
+## 五、用 Docker 启动完整系统
+
+这种方式不需要在本机运行 `pnpm dev`，前端、后端、PostgreSQL 和 MinIO 都在容器中运行。先在 `pnpm dev` 的终端按 `Ctrl+C`，避免 3000 端口冲突。
+
+第一次可复制 Docker 环境变量示例：
+
+```powershell
+if (!(Test-Path .env)) {
+  Copy-Item .env.docker.example .env
+}
+```
+
+`apps/api/.env` 供本机开发进程使用；根目录 `.env` 供 Docker Compose 使用，两者不要混淆。本地学习可以直接使用示例值，正式部署必须更换密码和 `JWT_SECRET`。
+
+构建镜像并启动全部服务：
+
+```powershell
+pnpm stack:up
+docker compose ps
+```
+
+等待四个服务都显示 `healthy`，然后打开 `http://localhost:8080`。代码修改后再次运行 `pnpm stack:up`，Compose 会重新构建有变化的镜像。
+
+只重新构建镜像、不启动容器：
+
+```powershell
+pnpm stack:build
+```
+
+## 六、怎么停止
 
 1. 在运行 `pnpm dev` 的终端按 `Ctrl+C`，停止前端和后端。
-2. 如果不再使用数据库和 MinIO，再执行：
+2. 如果使用本地开发模式且不再需要数据库和 MinIO，执行：
 
 ```powershell
 pnpm infra:down
@@ -148,13 +179,22 @@ pnpm infra:down
 
 `infra:down` 会停止并移除容器，但保留 Docker Volume 中的数据。不要随意运行 `docker compose down -v`，`-v` 会删除数据库和 MinIO 的持久化数据。
 
-## 六、修改代码后怎么检查
+完整 Docker 模式使用：
+
+```powershell
+pnpm stack:down
+```
+
+它同样保留 Volume。查看容器化前后端日志可运行 `pnpm stack:logs`，按 `Ctrl+C` 只退出日志跟随，不会停止容器。
+
+## 七、修改代码后怎么检查
 
 ```powershell
 pnpm check
 pnpm test
 pnpm test:integration
 pnpm build
+pnpm stack:build
 docker compose config --quiet
 ```
 
@@ -162,9 +202,10 @@ docker compose config --quiet
 - `test`：运行后端单元测试和前端组件测试；不依赖数据库、MinIO 或真实浏览器。
 - `test:integration`：临时启动隔离测试基础设施，执行真实 API 测试并自动清理。
 - `build`：生成前端和后端生产构建。
+- `stack:build`：在 Linux 容器内构建前端和后端生产镜像。
 - `docker compose config --quiet`：检查 Compose 配置语法。
 
-## 七、常见启动问题
+## 八、常见启动问题
 
 ### `P1001: Can't reach database server at localhost:5432`
 
@@ -185,15 +226,25 @@ Get-NetTCPConnection -State Listen |
 
 停止重复启动的旧进程，或调整对应配置后再运行。
 
+Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm dev` 后端和默认 Docker API；先在开发终端按 `Ctrl+C`，或者只为临时调试修改根目录 `.env` 中的 `API_HOST_PORT`。
+
 ### 页面能打开，但接口请求失败
 
 先直接访问 `http://localhost:3000/api/health`。如果打不开，查看 `pnpm dev` 终端中的 NestJS 错误；如果提示数据库或 MinIO 连接失败，再检查 `docker compose ps`。
 
 ### 签名预览地址指向错误电脑
 
-本机学习使用 `MINIO_PUBLIC_URL=http://127.0.0.1:9000`。如果让局域网其他电脑访问，应将它改为运行 MinIO 那台电脑可被访问的 IP 和端口，然后重启后端。
+本机学习使用 `MINIO_PUBLIC_URL=http://127.0.0.1:9000`。如果让局域网其他电脑访问，应在对应环境变量文件中把它改为运行 MinIO 那台电脑可被访问的 IP 和端口，然后重启后端或重建 API 容器。
 
-## 八、课程资料
+### Docker API 一直 unhealthy
+
+先运行 `docker compose logs api`。如果迁移失败，检查 PostgreSQL 是否 healthy 以及根目录 `.env` 的数据库账号是否一致；如果 3000 被占用，先停止本地开发后端。
+
+### Docker 页面打开，但 `/api` 返回 502
+
+运行 `docker compose ps` 和 `docker compose logs api web`。Web 容器通过服务名 `api:3000` 访问后端，不应把 Nginx 目标改成 `localhost:3000`。
+
+## 九、课程资料
 
 建议按顺序阅读 `docs`：
 
@@ -204,10 +255,11 @@ Get-NetTCPConnection -State Listen |
 - 第 6A 课：`docs/06a-backend-unit-tests.md`
 - 第 6B 课：`docs/06b-api-integration-tests.md`
 - 第 6C 课：`docs/06c-frontend-component-tests.md`
+- 第 7 课：`docs/07-dockerize-full-stack.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 
-## 九、常用命令速查
+## 十、常用命令速查
 
 ```powershell
 pnpm dev                   # 同时启动前端和后端
@@ -219,6 +271,10 @@ pnpm test:all              # 依次运行单元测试和 API 集成测试
 pnpm build                 # 生成生产构建
 pnpm infra:up              # 启动 PostgreSQL 和 MinIO
 pnpm infra:down            # 停止基础设施，保留 Volume 数据
+pnpm stack:build           # 构建前端和后端 Docker 镜像
+pnpm stack:up              # 构建并启动四个服务
+pnpm stack:down            # 停止完整容器系统，保留 Volume 数据
+pnpm stack:logs            # 持续查看容器化前后端日志
 pnpm db:up                 # 只启动 PostgreSQL
 pnpm db:down               # 只停止 PostgreSQL
 pnpm db:migrate            # 执行 Prisma 数据库迁移
