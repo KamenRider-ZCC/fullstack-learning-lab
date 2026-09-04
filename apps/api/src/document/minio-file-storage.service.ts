@@ -3,7 +3,10 @@ import { Client } from 'minio';
 import { randomUUID } from 'node:crypto';
 import { PDF_MIME_TYPE } from './document.constants.js';
 import type { FileStoragePort } from './file-storage.port.js';
-import { readMinioConfig } from './minio.config.js';
+import {
+  addPublicPathPrefix,
+  readMinioConfig,
+} from './minio.config.js';
 import type {
   TemporaryFileUrlPort,
   TemporaryReadUrlOptions,
@@ -58,7 +61,7 @@ export class MinioFileStorageService
     options: TemporaryReadUrlOptions,
   ) {
     const encodedName = encodeURIComponent(options.originalName);
-    return this.publicUrlClient.presignedGetObject(
+    const url = await this.publicUrlClient.presignedGetObject(
       this.config.bucket,
       storageKey,
       options.expiresInSeconds,
@@ -68,6 +71,7 @@ export class MinioFileStorageService
         'response-cache-control': 'private, no-store',
       },
     );
+    return addPublicPathPrefix(url, this.config.publicPathPrefix);
   }
 
   private async ensureBucket() {

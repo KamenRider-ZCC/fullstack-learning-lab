@@ -42,18 +42,19 @@
 - 第 6C 课（已完成）：使用 jsdom 和 Testing Library 完成前端组件与关键交互测试
 - 交付物：提交代码前可自动发现回归问题
 
-## 7. Docker 化（进行中）
+## 7. Docker 化（已完成）
 
 - 为前端、后端制作多阶段生产镜像
 - 使用 Nginx 托管前端并反向代理 `/api`
 - Docker Compose 编排前端、后端、数据库和 MinIO
-- 当前：理解镜像、容器、网络、健康检查、迁移和 Volume
+- 理解镜像、容器、网络、健康检查、迁移和 Volume
 - 交付物：新电脑一条命令运行完整系统
 
-## 8. Nginx、域名与 HTTPS
+## 8. Nginx、域名与 HTTPS（进行中）
 
-- Nginx 托管前端并反向代理 API
-- 配置域名、HTTPS、CORS 和 iframe CSP
+- Nginx 统一代理 API 与 MinIO 签名文件
+- 当前：本地自签名 HTTPS、混合内容、CORS 和 iframe CSP
+- 理解正式域名、CA 证书、开放端口与生产边界
 - 交付物：通过统一 HTTPS 地址访问系统
 
 ## 9. CI/CD 与运维基础

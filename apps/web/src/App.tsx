@@ -141,9 +141,9 @@ export default function App() {
         )}
 
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-xl font-semibold">第 7 课练习</h2>
+          <h2 className="text-xl font-semibold">第 8 课练习</h2>
           <p className="mt-3 leading-7 text-slate-400">
-            停止本机 pnpm dev 后运行 pnpm stack:up，再从 8080 端口观察 Nginx、NestJS、PostgreSQL 和 MinIO 的完整容器链路。
+            运行 pnpm https:cert 和 pnpm stack:https:up，从 8443 端口观察 TLS、CSP、同源 API 与 /storage 文件代理。
           </p>
         </section>
       </div>

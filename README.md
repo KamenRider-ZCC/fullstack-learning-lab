@@ -5,7 +5,7 @@
 - `apps/web`：React + Vite + Tailwind
 - `apps/api`：Node.js + NestJS + Prisma
 - 基础设施：PostgreSQL + MinIO + Docker Compose
-- 后续课程：域名、HTTPS、CI/CD 和运维基础
+- 后续课程：CI/CD、备份、监控和回滚
 
 ## 当前进度
 
@@ -19,7 +19,8 @@
 - 第 6A 课：使用 Vitest 和 Nest TestingModule 编写后端单元测试。
 - 第 6B 课：使用隔离的 PostgreSQL 和 MinIO 完成 API 集成测试。
 - 第 6C 课：使用 Vitest、jsdom 和 Testing Library 完成 React 组件测试。
-- 第 7 课（当前）：为前后端制作生产镜像，并用 Docker Compose 启动完整系统。
+- 第 7 课：为前后端制作生产镜像，并用 Docker Compose 启动完整系统。
+- 第 8 课（当前）：使用 Nginx 统一入口，学习本地 HTTPS、CSP、CORS 和 iframe 安全边界。
 
 ## 一、运行前准备
 
@@ -123,6 +124,7 @@ pnpm dev
 | --- | --- | --- |
 | React 开发页面 | `http://localhost:5173` | 使用 Vite 开发服务操作完整功能 |
 | Docker 完整页面 | `http://localhost:8080` | 使用 Nginx 访问容器化系统 |
+| Docker HTTPS 页面 | `https://localhost:8443` | 使用本地自签名证书学习 HTTPS |
 | API 健康检查 | `http://localhost:3000/api/health` | 确认 NestJS 可访问 |
 | MinIO Console | `http://localhost:9001` | 查看 Bucket 和对象 |
 
@@ -168,6 +170,19 @@ docker compose ps
 pnpm stack:build
 ```
 
+### 本地 HTTPS 模式
+
+第一次先生成本地自签名证书，再启动 HTTPS 组合配置：
+
+```powershell
+pnpm https:cert
+pnpm stack:https:up
+```
+
+打开 `https://localhost:8443`。浏览器会提示证书不受信任，这是自签名学习证书的正常现象；正式环境必须使用受信任 CA 为真实域名签发的证书。
+
+HTTPS 页面中的 PDF 会通过同源 `/storage` 入口转发到 MinIO，不会产生“HTTPS 页面嵌入 HTTP 文件”的混合内容错误。证书和私钥保存在被 Git 忽略的 `.certs`，不能提交或用于正式环境。
+
 ## 六、怎么停止
 
 1. 在运行 `pnpm dev` 的终端按 `Ctrl+C`，停止前端和后端。
@@ -185,6 +200,12 @@ pnpm infra:down
 pnpm stack:down
 ```
 
+如果使用 HTTPS 组合配置，也可以执行：
+
+```powershell
+pnpm stack:https:down
+```
+
 它同样保留 Volume。查看容器化前后端日志可运行 `pnpm stack:logs`，按 `Ctrl+C` 只退出日志跟随，不会停止容器。
 
 ## 七、修改代码后怎么检查
@@ -196,6 +217,7 @@ pnpm test:integration
 pnpm build
 pnpm stack:build
 docker compose config --quiet
+docker compose --file compose.yaml --file compose.https.yaml config --quiet
 ```
 
 - `check`：只做 TypeScript 类型检查。
@@ -204,6 +226,7 @@ docker compose config --quiet
 - `build`：生成前端和后端生产构建。
 - `stack:build`：在 Linux 容器内构建前端和后端生产镜像。
 - `docker compose config --quiet`：检查 Compose 配置语法。
+- 第二条 Compose 命令：检查基础配置与 HTTPS 覆盖配置合并后是否合法。
 
 ## 八、常见启动问题
 
@@ -244,6 +267,14 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 
 运行 `docker compose ps` 和 `docker compose logs api web`。Web 容器通过服务名 `api:3000` 访问后端，不应把 Nginx 目标改成 `localhost:3000`。
 
+### HTTPS 页面提示连接不安全
+
+`pnpm https:cert` 生成的是自签名证书，浏览器无法自动信任，只适合本机学习。正式上线不能让用户忽略警告，必须把域名解析到服务器并申请受信任证书。
+
+### HTTPS 页面能打开，但 PDF 被浏览器拦截
+
+确认使用 `pnpm stack:https:up`，并检查预览 URL 是否以当前 HTTPS 入口的 `/storage/` 开头。如果仍是 `http://...:9000`，说明 API 没有加载 `compose.https.yaml` 中的公共地址配置。
+
 ## 九、课程资料
 
 建议按顺序阅读 `docs`：
@@ -256,6 +287,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 第 6B 课：`docs/06b-api-integration-tests.md`
 - 第 6C 课：`docs/06c-frontend-component-tests.md`
 - 第 7 课：`docs/07-dockerize-full-stack.md`
+- 第 8 课：`docs/08-nginx-https-security.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 
@@ -275,6 +307,9 @@ pnpm stack:build           # 构建前端和后端 Docker 镜像
 pnpm stack:up              # 构建并启动四个服务
 pnpm stack:down            # 停止完整容器系统，保留 Volume 数据
 pnpm stack:logs            # 持续查看容器化前后端日志
+pnpm https:cert            # 生成被 Git 忽略的本地自签名证书
+pnpm stack:https:up        # 构建并启动 HTTP + HTTPS 学习环境
+pnpm stack:https:down      # 停止 HTTPS 组合环境并保留 Volume
 pnpm db:up                 # 只启动 PostgreSQL
 pnpm db:down               # 只停止 PostgreSQL
 pnpm db:migrate            # 执行 Prisma 数据库迁移

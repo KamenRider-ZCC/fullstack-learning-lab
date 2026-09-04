@@ -6,6 +6,7 @@ export interface MinioConfig {
   secretKey: string;
   bucket: string;
   region: string;
+  publicPathPrefix: string;
   publicEndpoint: {
     endPoint: string;
     port: number;
@@ -27,8 +28,41 @@ export function readMinioConfig(): MinioConfig {
     secretKey: readRequired('MINIO_SECRET_KEY'),
     bucket: readRequired('MINIO_BUCKET'),
     region: readRequired('MINIO_REGION'),
+    publicPathPrefix: normalizePublicPathPrefix(
+      process.env.MINIO_PUBLIC_PATH_PREFIX || '',
+    ),
     publicEndpoint: parsePublicUrl(readRequired('MINIO_PUBLIC_URL')),
   };
+}
+
+export function normalizePublicPathPrefix(value: string) {
+  const prefix = value.trim();
+  if (!prefix) return '';
+  if (
+    !prefix.startsWith('/')
+    || prefix.endsWith('/')
+    || prefix.includes('//')
+    || !/^\/[A-Za-z0-9._~/-]+$/.test(prefix)
+    || prefix.split('/').includes('..')
+  ) {
+    throw new Error(
+      'MINIO_PUBLIC_PATH_PREFIX 必须是以 / 开头、不以 / 结尾的安全路径',
+    );
+  }
+  return prefix;
+}
+
+export function addPublicPathPrefix(value: string, prefix: string) {
+  if (!prefix) return value;
+  new URL(value);
+  const authorityStart = value.indexOf('://') + 3;
+  const pathStart = value.indexOf('/', authorityStart);
+  if (pathStart >= 0) {
+    return `${value.slice(0, pathStart)}${prefix}${value.slice(pathStart)}`;
+  }
+  const suffixStart = value.search(/[?#]/);
+  const insertAt = suffixStart >= 0 ? suffixStart : value.length;
+  return `${value.slice(0, insertAt)}${prefix}/${value.slice(insertAt)}`;
 }
 
 function parsePublicUrl(value: string) {

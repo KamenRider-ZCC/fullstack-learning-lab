@@ -22,6 +22,9 @@
     "stack:up": "docker compose up --build -d",
     "stack:down": "docker compose down",
     "stack:logs": "docker compose logs -f api web",
+    "https:cert": "node scripts/generate-dev-certificate.mjs",
+    "stack:https:up": "docker compose --file compose.yaml --file compose.https.yaml up --build -d",
+    "stack:https:down": "docker compose --file compose.yaml --file compose.https.yaml down",
     "storage:migrate-local": "pnpm --filter @fullstack-lab/api run storage:migrate-local"
   }
 }
