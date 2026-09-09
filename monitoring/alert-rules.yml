@@ -1,0 +1,20 @@
+groups:
+  - name: fullstack-learning-lab
+    rules:
+      - alert: FullstackApiScrapeDown
+        expr: up{job="fullstack-learning-api"} == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: Prometheus 无法抓取学习项目 API
+          description: API 指标已连续 15 秒抓取失败，请先确认 NestJS 是否运行以及 3000 端口是否可访问。
+
+      - alert: FullstackDependencyDown
+        expr: fullstack_dependency_up{job="fullstack-learning-api"} == 0
+        for: 15s
+        labels:
+          severity: warning
+        annotations:
+          summary: 学习项目必要依赖不可用
+          description: "{{ $labels.dependency }} 已连续 15 秒不可用，API 进程可能仍然存活，但服务尚未就绪。"
