@@ -3,6 +3,7 @@ import { Client } from 'minio';
 import { randomUUID } from 'node:crypto';
 import { PDF_MIME_TYPE } from './document.constants.js';
 import type { FileStoragePort } from './file-storage.port.js';
+import type { StorageHealthPort } from './storage-health.port.js';
 import {
   addPublicPathPrefix,
   readMinioConfig,
@@ -14,7 +15,11 @@ import type {
 
 @Injectable()
 export class MinioFileStorageService
-  implements OnModuleInit, FileStoragePort, TemporaryFileUrlPort {
+  implements
+    OnModuleInit,
+    FileStoragePort,
+    TemporaryFileUrlPort,
+    StorageHealthPort {
   private readonly config = readMinioConfig();
   private readonly client = new Client({
     endPoint: this.config.endPoint,
@@ -54,6 +59,13 @@ export class MinioFileStorageService
 
   async remove(storageKey: string) {
     await this.client.removeObject(this.config.bucket, storageKey);
+  }
+
+  async checkHealth() {
+    const bucketExists = await this.client.bucketExists(this.config.bucket);
+    if (!bucketExists) {
+      throw new Error('MinIO bucket is unavailable');
+    }
   }
 
   async createTemporaryReadUrl(

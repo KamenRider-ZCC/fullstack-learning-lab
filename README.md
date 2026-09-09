@@ -23,7 +23,8 @@
 - 第 6C 课：使用 Vitest、jsdom 和 Testing Library 完成 React 组件测试。
 - 第 7 课：为前后端制作生产镜像，并用 Docker Compose 启动完整系统。
 - 第 8 课：使用 Nginx 统一入口，学习本地 HTTPS、CSP、CORS 和 iframe 安全边界。
-- 第 9 课（当前）：使用 CI 自动检查并发布镜像，学习生产配置、备份和可回滚发布。
+- 第 9 课：使用 CI 自动检查并发布镜像，学习生产配置、备份和可回滚发布。
+- 第 10A 课（当前）：区分存活检查与就绪检查，并定位 PostgreSQL、MinIO 故障。
 
 ## 一、运行前准备
 
@@ -128,7 +129,8 @@ pnpm dev
 | React 开发页面 | `http://localhost:5173` | 使用 Vite 开发服务操作完整功能 |
 | Docker 完整页面 | `http://localhost:8080` | 使用 Nginx 访问容器化系统 |
 | Docker HTTPS 页面 | `https://localhost:8443` | 使用本地自签名证书学习 HTTPS |
-| API 健康检查 | `http://localhost:3000/api/health` | 确认 NestJS 可访问 |
+| API 存活检查 | `http://localhost:3000/api/health/live` | 确认 NestJS 进程可响应 |
+| API 就绪检查 | `http://localhost:3000/api/health/ready` | 确认 PostgreSQL 与 MinIO 可用 |
 | MinIO Console | `http://localhost:9001` | 查看 Bucket 和对象 |
 
 MinIO 本地学习账号为 `minioadmin / minioadmin123`。端口 9001 是管理页面；后端和签名 URL 使用 9000。
@@ -295,7 +297,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 
 ### 页面能打开，但接口请求失败
 
-先直接访问 `http://localhost:3000/api/health`。如果打不开，查看 `pnpm dev` 终端中的 NestJS 错误；如果提示数据库或 MinIO 连接失败，再检查 `docker compose ps`。
+先访问 `http://localhost:3000/api/health/live` 判断 NestJS 是否存活，再访问 `http://localhost:3000/api/health/ready` 判断 PostgreSQL 和 MinIO 是否就绪。前者打不开就查看 `pnpm dev` 终端；前者正常而后者返回 503，就检查 `docker compose ps` 和后端日志。
 
 ### 签名预览地址指向错误电脑
 
@@ -332,6 +334,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 第 7 课：`docs/07-dockerize-full-stack.md`
 - 第 8 课：`docs/08-nginx-https-security.md`
 - 第 9 课：`docs/09-ci-cd-backup-rollback.md`
+- 第 10A 课：`docs/10a-liveness-readiness.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 

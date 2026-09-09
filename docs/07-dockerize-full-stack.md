@@ -350,7 +350,7 @@ MINIO_PUBLIC_URL=http://127.0.0.1:9000
 | --- | --- |
 | PostgreSQL | `pg_isready` |
 | MinIO | `/minio/health/live` |
-| API | `/api/health` |
+| API | `/api/health/ready` |
 | Web | `/healthz` |
 
 依赖链是：

@@ -529,7 +529,7 @@ AI 可以帮助列威胁清单和编写 Guard，但权限规则必须由你和�
 
 **答案：** 健康检查通常只探测一个轻量地址或进程，能发现服务未启动，却不一定覆盖登录、权限、数据库写入、MinIO 上传和 PDF 预览。Web 返回 `ok` 时，API 仍可能配置错误；API 健康时，某项业务规则仍可能有 Bug。
 
-**项目 Demo：** `compose.yaml` 为四个服务定义 `healthcheck`；API 的探针访问 `/api/health`，Web 访问 `/healthz`。发布后还要按照 `README.md` 和 `docs/09-ci-cd-backup-rollback.md` 做登录、评分、上传、预览等冒烟检查。
+**项目 Demo：** `compose.yaml` 为四个服务定义 `healthcheck`；API 的探针访问 `/api/health/ready`，Web 访问 `/healthz`。`docs/10a-liveness-readiness.md` 解释了存活与就绪的区别。发布后还要按照 `README.md` 和 `docs/09-ci-cd-backup-rollback.md` 做登录、评分、上传、预览等冒烟检查。
 
 #### 9.7 CI、镜像仓库和生产服务器如何分工？
 

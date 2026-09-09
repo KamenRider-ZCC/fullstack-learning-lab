@@ -56,6 +56,17 @@ describe('真实 HTTP + PostgreSQL + MinIO', () => {
     });
   });
 
+  it('就绪检查实际连接测试 PostgreSQL 和 MinIO', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/health/ready')
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      status: 'ok',
+      checks: { postgres: 'up', minio: 'up' },
+    });
+  });
+
   it('未登录不能读取文件列表', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/documents')

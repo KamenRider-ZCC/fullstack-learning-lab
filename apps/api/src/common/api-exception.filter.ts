@@ -10,6 +10,7 @@ import {
 interface ErrorPayload {
   code?: unknown;
   message?: unknown;
+  details?: unknown;
 }
 
 interface HttpResponse {
@@ -86,7 +87,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
           : typeof payload.message === 'string'
             ? payload.message
             : '请求失败',
-      details: validationMessages,
+      details: validationMessages || payload.details,
     };
   }
 }
