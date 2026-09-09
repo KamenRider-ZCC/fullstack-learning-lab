@@ -54,6 +54,7 @@ describe('真实 HTTP + PostgreSQL + MinIO', () => {
       status: 'ok',
       service: 'fullstack-learning-api',
     });
+    expect(response.headers['x-request-id']).toBeTruthy();
   });
 
   it('就绪检查实际连接测试 PostgreSQL 和 MinIO', async () => {
@@ -77,6 +78,7 @@ describe('真实 HTTP + PostgreSQL + MinIO', () => {
       code: 'AUTH_REQUIRED',
       path: '/api/documents',
     });
+    expect(response.body.requestId).toBe(response.headers['x-request-id']);
   });
 
   it('查看角色不能上传文件', async () => {

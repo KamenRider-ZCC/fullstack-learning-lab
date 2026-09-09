@@ -24,7 +24,8 @@
 - 第 7 课：为前后端制作生产镜像，并用 Docker Compose 启动完整系统。
 - 第 8 课：使用 Nginx 统一入口，学习本地 HTTPS、CSP、CORS 和 iframe 安全边界。
 - 第 9 课：使用 CI 自动检查并发布镜像，学习生产配置、备份和可回滚发布。
-- 第 10A 课（当前）：区分存活检查与就绪检查，并定位 PostgreSQL、MinIO 故障。
+- 第 10A 课：区分存活检查与就绪检查，并定位 PostgreSQL、MinIO 故障。
+- 第 10B 课（当前）：使用 Request ID 关联浏览器请求、错误响应与后端日志。
 
 ## 一、运行前准备
 
@@ -335,6 +336,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 第 8 课：`docs/08-nginx-https-security.md`
 - 第 9 课：`docs/09-ci-cd-backup-rollback.md`
 - 第 10A 课：`docs/10a-liveness-readiness.md`
+- 第 10B 课：`docs/10b-request-id-logging.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 

@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import type { RequestWithId } from './request-id.middleware.js';
 
 interface ErrorPayload {
   code?: unknown;
@@ -33,7 +34,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost) {
     const http = host.switchToHttp();
-    const request = http.getRequest<{ url: string }>();
+    const request = http.getRequest<RequestWithId>();
     const response = http.getResponse<HttpResponse>();
     const status = exception instanceof HttpException
       ? exception.getStatus()
@@ -41,7 +42,15 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const payload = this.readPayload(exception);
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      this.logger.error(exception);
+      const errorDetails = exception instanceof Error
+        ? exception.stack
+        : String(exception);
+      this.logger.error(JSON.stringify({
+        event: 'unhandled_exception',
+        requestId: request.requestId,
+        method: request.method,
+        path: request.path,
+      }), errorDetails);
     }
 
     response.status(status).json({
@@ -49,6 +58,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       code: payload.code,
       message: payload.message,
       details: payload.details,
+      requestId: request.requestId,
       timestamp: new Date().toISOString(),
       path: request.url,
     });

@@ -1,11 +1,18 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
+import type { NestModule } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module.js';
 import { DocumentModule } from './document/document.module.js';
 import { HealthModule } from './health/health.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ReviewModule } from './review/review.module.js';
+import { RequestIdMiddleware } from './common/request-id.middleware.js';
 
 @Module({
   imports: [PrismaModule, HealthModule, AuthModule, ReviewModule, DocumentModule],
+  providers: [RequestIdMiddleware],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
+  }
+}
