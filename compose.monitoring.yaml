@@ -1,6 +1,18 @@
 name: fullstack-learning-lab-monitoring
 
 services:
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:v3.5.0
     command:
@@ -14,6 +26,8 @@ services:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./monitoring/alert-rules.yml:/etc/prometheus/rules/alert-rules.yml:ro
       - prometheus-data:/prometheus
+    depends_on:
+      - alertmanager
     restart: unless-stopped
 
   grafana:
@@ -33,5 +47,6 @@ services:
     restart: unless-stopped
 
 volumes:
+  alertmanager-data:
   prometheus-data:
   grafana-data:

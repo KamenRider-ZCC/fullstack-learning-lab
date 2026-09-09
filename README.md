@@ -29,7 +29,8 @@
 - 第 10C 课：使用最小 HTTP 指标观察请求量、状态码和平均耗时。
 - 第 10D 课：运行独立 Prometheus 容器，定时抓取并保存 API 指标。
 - 第 10E 课：使用 Grafana 展示 API、依赖状态、请求量和耗时指标。
-- 第 10F 课（当前）：使用 Prometheus 规则发现 API 抓取失败和必要依赖故障。
+- 第 10F 课：使用 Prometheus 规则发现 API 抓取失败和必要依赖故障。
+- 第 10G 课：使用 Alertmanager 接收、分组和静默已触发的告警。
 
 ## 一、运行前准备
 
@@ -140,6 +141,7 @@ pnpm dev
 | Prometheus 指标 | `http://localhost:3000/api/metrics/prometheus` | 查看 Prometheus 文本格式 |
 | Prometheus 页面 | `http://localhost:9090` | 查询监控历史和检查抓取目标 |
 | Prometheus 告警 | `http://localhost:9090/alerts` | 查看告警等待、触发与恢复状态 |
+| Alertmanager 页面 | `http://localhost:9093` | 查看 Prometheus 发送来的活动告警 |
 | Grafana 仪表盘 | `http://localhost:3001` | 展示 Prometheus 中的监控数据 |
 | MinIO Console | `http://localhost:9001` | 查看 Bucket 和对象 |
 
@@ -347,6 +349,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 
 建议按顺序阅读 `docs`：
 
+- 项目必读文件地图：`docs/00-project-file-reading-map.md`
 - AI 全栈必备知识地图：`docs/00-ai-fullstack-essential-guide.md`
 - 第 4 课慢速拆解：`docs/04b-auth-code-walkthrough.md`
 - 第 5A 课：`docs/05a-local-file-upload.md`
@@ -364,6 +367,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 第 10D 课：`docs/10d-prometheus-scraping.md`
 - 第 10E 课：`docs/10e-grafana-dashboard.md`
 - 第 10F 课：`docs/10f-prometheus-alert-rules.md`
+- 第 10G 课：`docs/10g-alertmanager.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 

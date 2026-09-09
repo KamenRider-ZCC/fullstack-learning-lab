@@ -1,0 +1,14 @@
+# Alertmanager 接收 Prometheus 已经判定为 Firing 的告警。
+route:
+  # 相同告警和任务放在同一组，避免一次故障产生大量重复通知。
+  group_by:
+    - alertname
+    - job
+  # 本地课程只在 Alertmanager 页面展示，不向外部发送消息。
+  receiver: local-ui-only
+  group_wait: 5s
+  group_interval: 30s
+  repeat_interval: 4h
+
+receivers:
+  - name: local-ui-only
