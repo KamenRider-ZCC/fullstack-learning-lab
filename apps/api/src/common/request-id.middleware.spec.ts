@@ -5,6 +5,11 @@ import {
   type RequestWithId,
 } from './request-id.middleware.js';
 
+const metricsService = {
+  requestStarted: vi.fn(),
+  requestCompleted: vi.fn(),
+};
+
 function createResponse() {
   let finishHandler: (() => void) | undefined;
   const response = {
@@ -17,17 +22,21 @@ function createResponse() {
   return { response, finish: () => finishHandler?.() };
 }
 
-function createRequest(incomingId?: string) {
+function createRequest(
+  incomingId?: string,
+  originalUrl = '/api/health/live',
+) {
   return {
     method: 'GET',
-    path: '/api/health/live',
+    path: originalUrl,
+    originalUrl,
     header: vi.fn(() => incomingId),
   } as unknown as RequestWithId;
 }
 
 describe('RequestIdMiddleware', () => {
   it('没有上游 ID 时生成 ID 并写入响应头', () => {
-    const middleware = new RequestIdMiddleware();
+    const middleware = new RequestIdMiddleware(metricsService as never);
     const request = createRequest();
     const { response, finish } = createResponse();
     const next = vi.fn() as NextFunction;
@@ -44,7 +53,7 @@ describe('RequestIdMiddleware', () => {
   });
 
   it('复用格式安全的上游 ID', () => {
-    const middleware = new RequestIdMiddleware();
+    const middleware = new RequestIdMiddleware(metricsService as never);
     const request = createRequest('gateway-request-123');
     const { response } = createResponse();
 
@@ -54,7 +63,7 @@ describe('RequestIdMiddleware', () => {
   });
 
   it('拒绝可能污染日志的上游 ID', () => {
-    const middleware = new RequestIdMiddleware();
+    const middleware = new RequestIdMiddleware(metricsService as never);
     const request = createRequest('bad\nforged-log-entry');
     const { response } = createResponse();
 
@@ -62,5 +71,17 @@ describe('RequestIdMiddleware', () => {
 
     expect(request.requestId).not.toContain('\n');
     expect(request.requestId).not.toBe('bad\nforged-log-entry');
+  });
+
+  it('查看指标的请求不计入指标', () => {
+    const middleware = new RequestIdMiddleware(metricsService as never);
+    const request = createRequest(undefined, '/api/metrics');
+    const { response, finish } = createResponse();
+
+    middleware.use(request, response, vi.fn());
+    finish();
+
+    expect(metricsService.requestStarted).not.toHaveBeenCalled();
+    expect(metricsService.requestCompleted).not.toHaveBeenCalled();
   });
 });

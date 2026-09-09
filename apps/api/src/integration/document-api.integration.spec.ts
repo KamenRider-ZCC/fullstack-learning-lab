@@ -68,6 +68,18 @@ describe('真实 HTTP + PostgreSQL + MinIO', () => {
     });
   });
 
+  it('指标接口汇总已经完成的 HTTP 请求', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/metrics')
+      .expect(200);
+
+    expect(response.body.http).toMatchObject({
+      requestsActive: 0,
+      serverErrorsTotal: 0,
+    });
+    expect(response.body.http.requestsTotal).toBeGreaterThanOrEqual(2);
+  });
+
   it('未登录不能读取文件列表', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/documents')

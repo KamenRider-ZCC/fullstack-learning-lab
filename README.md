@@ -25,7 +25,8 @@
 - 第 8 课：使用 Nginx 统一入口，学习本地 HTTPS、CSP、CORS 和 iframe 安全边界。
 - 第 9 课：使用 CI 自动检查并发布镜像，学习生产配置、备份和可回滚发布。
 - 第 10A 课：区分存活检查与就绪检查，并定位 PostgreSQL、MinIO 故障。
-- 第 10B 课（当前）：使用 Request ID 关联浏览器请求、错误响应与后端日志。
+- 第 10B 课：使用 Request ID 关联浏览器请求、错误响应与后端日志。
+- 第 10C 课（当前）：使用最小 HTTP 指标观察请求量、状态码和平均耗时。
 
 ## 一、运行前准备
 
@@ -132,6 +133,7 @@ pnpm dev
 | Docker HTTPS 页面 | `https://localhost:8443` | 使用本地自签名证书学习 HTTPS |
 | API 存活检查 | `http://localhost:3000/api/health/live` | 确认 NestJS 进程可响应 |
 | API 就绪检查 | `http://localhost:3000/api/health/ready` | 确认 PostgreSQL 与 MinIO 可用 |
+| API 学习指标 | `http://localhost:3000/api/metrics` | 查看当前进程的 HTTP 汇总指标 |
 | MinIO Console | `http://localhost:9001` | 查看 Bucket 和对象 |
 
 MinIO 本地学习账号为 `minioadmin / minioadmin123`。端口 9001 是管理页面；后端和签名 URL 使用 9000。
@@ -337,6 +339,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 第 9 课：`docs/09-ci-cd-backup-rollback.md`
 - 第 10A 课：`docs/10a-liveness-readiness.md`
 - 第 10B 课：`docs/10b-request-id-logging.md`
+- 第 10C 课：`docs/10c-minimal-http-metrics.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 
