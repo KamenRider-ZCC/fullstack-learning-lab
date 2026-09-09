@@ -75,9 +75,11 @@ on:
 
 ### 2. `quality` 为什么先执行
 
-这个任务依次安装锁定版本的依赖，然后执行：
+这个任务先在全新的 Linux Runner 中安装锁定版本的依赖、根据 Prisma Schema 生成 Prisma Client，然后执行检查：
 
 ```text
+pnpm install --frozen-lockfile
+pnpm --filter @fullstack-lab/api run db:generate
 pnpm check
 pnpm test:all
 pnpm build
@@ -85,6 +87,24 @@ docker compose ... config --quiet
 ```
 
 `pnpm install --frozen-lockfile` 的含义是严格按照 `pnpm-lock.yaml` 安装。如果 `package.json` 与锁文件不一致，CI 会失败，而不是在 Runner 上偷偷生成一个新锁文件。
+
+`prisma generate` 不连接数据库，也不执行迁移。它读取 `apps/api/prisma/schema.prisma`，生成 TypeScript 可使用的 `PrismaClient` 以及 `User`、`Document` 等类型。本地执行过迁移或生成命令后，这些文件已经存在于 `node_modules`，所以本地类型检查可能通过；GitHub Runner 每次都是干净环境，工作流如果遗漏生成步骤，就会出现“`PrismaClient` 没有导出”以及“`PrismaService` 不存在 `user`、`document`”等连锁错误。
+
+### 2.1 CI 到底有什么用
+
+CI 可以理解为 GitHub 临时提供一台干净电脑，按照工作流重新验证提交内容。它主要解决“我的电脑能运行，但仓库里的代码在别人电脑上不能运行”的问题。
+
+```text
+开发者推送代码
+→ GitHub 创建临时 Linux Runner
+→ 重新拉取仓库
+→ 从零安装锁定依赖
+→ 生成 Prisma Client
+→ 类型检查、测试、构建和配置检查
+→ 全部通过才允许后续生成镜像
+```
+
+CI 通过不等于业务一定没有问题，但至少证明仓库中已提交的代码和配置能够在可重复环境中完成约定检查。失败邮件的价值是尽早暴露缺文件、缺生成步骤、测试回归、Linux 大小写差异或构建失败，而不是等到客户或服务器部署时才发现。
 
 测试包括后端单元测试、React 组件测试和真实 API 集成测试。集成测试使用隔离的 PostgreSQL 与 MinIO，结束后销毁测试容器，不接触开发或生产数据。
 
@@ -357,6 +377,16 @@ Compose 会用旧镜像重建 API/Web 容器，数据库和 MinIO Volume 不会�
 ### CI 中 `pnpm install --frozen-lockfile` 失败
 
 通常是修改了 `package.json` 却没有提交对应 `pnpm-lock.yaml`。本地运行 `pnpm install`，检查依赖变化后一起提交。
+
+### CI 中提示 PrismaClient 或模型成员不存在
+
+先看 `Generate Prisma Client` 是否成功执行。CI 必须在 `Type-check` 前运行：
+
+```powershell
+pnpm --filter @fullstack-lab/api run db:generate
+```
+
+这一步只生成客户端代码，不代替 `prisma migrate deploy`，也不需要连接开发或生产数据库。
 
 ### 单元测试通过，集成测试失败
 

@@ -111,6 +111,8 @@ Request ID → 放在日志中，用于查某一次请求
 
 正式环境通常由 Prometheus 周期抓取每个实例的指标，Grafana 展示趋势，再由 Alertmanager 等组件发送告警。
 
+第 10D 课已增加 `/api/metrics/prometheus` 标准文本端点和独立 Prometheus 容器；本课的 `/api/metrics` JSON 继续保留用于入门观察。
+
 ## 8. 安全边界
 
 学习环境可以直接访问 `/api/metrics`。正式环境通常只允许监控网络访问，不能默认公开到互联网。指标名称和标签也不能包含 Token、密码、个人信息或商业敏感内容。

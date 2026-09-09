@@ -21,7 +21,7 @@ export class RequestIdMiddleware implements NestMiddleware {
   use(request: RequestWithId, response: Response, next: NextFunction) {
     const startedAt = Date.now();
     const requestPath = request.originalUrl.split('?')[0];
-    const shouldMeasure = requestPath !== '/api/metrics';
+    const shouldMeasure = !requestPath.startsWith('/api/metrics');
     request.requestId = this.resolveRequestId(request);
     response.setHeader('X-Request-Id', request.requestId);
     if (shouldMeasure) this.metricsService.requestStarted();

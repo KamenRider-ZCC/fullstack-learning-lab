@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: fullstack-learning-api
+    metrics_path: /api/metrics/prometheus
+    static_configs:
+      - targets:
+          - host.docker.internal:3000

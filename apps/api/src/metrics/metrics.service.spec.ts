@@ -47,4 +47,18 @@ describe('MetricsService', () => {
 
     expect(service.getSnapshot().http.requestsActive).toBe(1);
   });
+
+  it('输出 Prometheus 可以抓取的文本格式', () => {
+    service.requestStarted();
+    service.requestCompleted(200, 250);
+
+    const output = service.getPrometheusText();
+
+    expect(output).toContain('# TYPE fullstack_http_requests_total counter');
+    expect(output).toContain('fullstack_http_requests_total 1');
+    expect(output).toContain(
+      'fullstack_http_responses_total{status_class="2xx"} 1',
+    );
+    expect(output).toContain('fullstack_http_request_duration_seconds_sum 0.25');
+  });
 });

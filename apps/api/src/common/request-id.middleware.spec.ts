@@ -84,4 +84,16 @@ describe('RequestIdMiddleware', () => {
     expect(metricsService.requestStarted).not.toHaveBeenCalled();
     expect(metricsService.requestCompleted).not.toHaveBeenCalled();
   });
+
+  it('Prometheus 抓取请求也不计入业务指标', () => {
+    const middleware = new RequestIdMiddleware(metricsService as never);
+    const request = createRequest(undefined, '/api/metrics/prometheus');
+    const { response, finish } = createResponse();
+
+    middleware.use(request, response, vi.fn());
+    finish();
+
+    expect(metricsService.requestStarted).not.toHaveBeenCalled();
+    expect(metricsService.requestCompleted).not.toHaveBeenCalled();
+  });
 });

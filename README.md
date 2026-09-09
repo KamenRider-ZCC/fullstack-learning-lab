@@ -26,7 +26,8 @@
 - 第 9 课：使用 CI 自动检查并发布镜像，学习生产配置、备份和可回滚发布。
 - 第 10A 课：区分存活检查与就绪检查，并定位 PostgreSQL、MinIO 故障。
 - 第 10B 课：使用 Request ID 关联浏览器请求、错误响应与后端日志。
-- 第 10C 课（当前）：使用最小 HTTP 指标观察请求量、状态码和平均耗时。
+- 第 10C 课：使用最小 HTTP 指标观察请求量、状态码和平均耗时。
+- 第 10D 课（当前）：运行独立 Prometheus 容器，定时抓取并保存 API 指标。
 
 ## 一、运行前准备
 
@@ -134,6 +135,8 @@ pnpm dev
 | API 存活检查 | `http://localhost:3000/api/health/live` | 确认 NestJS 进程可响应 |
 | API 就绪检查 | `http://localhost:3000/api/health/ready` | 确认 PostgreSQL 与 MinIO 可用 |
 | API 学习指标 | `http://localhost:3000/api/metrics` | 查看当前进程的 HTTP 汇总指标 |
+| Prometheus 指标 | `http://localhost:3000/api/metrics/prometheus` | 查看 Prometheus 文本格式 |
+| Prometheus 页面 | `http://localhost:9090` | 查询监控历史和检查抓取目标 |
 | MinIO Console | `http://localhost:9001` | 查看 Bucket 和对象 |
 
 MinIO 本地学习账号为 `minioadmin / minioadmin123`。端口 9001 是管理页面；后端和签名 URL 使用 9000。
@@ -148,6 +151,12 @@ pnpm dev
 ```
 
 日常启动不需要重复安装依赖、迁移数据库或迁移旧文件，除非依赖、数据库结构或课程说明发生了变化。
+
+监控课程需要额外启动独立 Prometheus：
+
+```powershell
+pnpm monitoring:up
+```
 
 ## 五、用 Docker 启动完整系统
 
@@ -193,7 +202,7 @@ HTTPS 页面中的 PDF 会通过同源 `/storage` 入口转发到 MinIO，不会
 
 ### 第 9 课：生产配置、发布和备份
 
-GitHub Actions 配置在 `.github/workflows/ci.yml`：Pull Request 只做检查、测试和构建；代码进入 `master` 或推送 `v*` 标签后，还会把 API、Web 镜像发布到 GHCR。它不会自动连接真实服务器，因此当前属于“自动交付镜像、人工确认上线”。
+GitHub Actions 配置在 `.github/workflows/ci.yml`：每次在干净的 Linux Runner 中安装锁定依赖、生成 Prisma Client，再执行检查、测试和构建；代码进入 `master` 或推送 `v*` 标签后，还会把 API、Web 镜像发布到 GHCR。它不会自动连接真实服务器，因此当前属于“自动交付镜像、人工确认上线”。
 
 第一次准备生产服务器时，复制并修改生产环境变量：
 
@@ -238,6 +247,14 @@ pnpm infra:down
 ```
 
 `infra:down` 会停止并移除容器，但保留 Docker Volume 中的数据。不要随意运行 `docker compose down -v`，`-v` 会删除数据库和 MinIO 的持久化数据。
+
+Prometheus 使用独立 Compose 文件，停止命令是：
+
+```powershell
+pnpm monitoring:down
+```
+
+该命令同样保留 Prometheus Volume。
 
 完整 Docker 模式使用：
 
@@ -340,6 +357,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 第 10A 课：`docs/10a-liveness-readiness.md`
 - 第 10B 课：`docs/10b-request-id-logging.md`
 - 第 10C 课：`docs/10c-minimal-http-metrics.md`
+- 第 10D 课：`docs/10d-prometheus-scraping.md`
 - 完整学习路线：`docs/roadmap.md`
 - 陌生术语：`docs/glossary.md`
 
@@ -355,6 +373,9 @@ pnpm test:all              # 依次运行单元测试和 API 集成测试
 pnpm build                 # 生成生产构建
 pnpm infra:up              # 启动 PostgreSQL 和 MinIO
 pnpm infra:down            # 停止基础设施，保留 Volume 数据
+pnpm monitoring:up         # 启动独立 Prometheus
+pnpm monitoring:down       # 停止 Prometheus，保留监控 Volume
+pnpm monitoring:logs       # 持续查看 Prometheus 日志
 pnpm stack:build           # 构建前端和后端 Docker 镜像
 pnpm stack:up              # 构建并启动四个服务
 pnpm stack:down            # 停止完整容器系统，保留 Volume 数据
