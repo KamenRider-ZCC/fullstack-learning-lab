@@ -7,9 +7,11 @@ export interface HealthResponse {
 
 export type DependencyStatus = 'up' | 'down';
 
+export interface DependencyChecks {
+  postgres: DependencyStatus;
+  minio: DependencyStatus;
+}
+
 export interface ReadinessResponse extends HealthResponse {
-  checks: {
-    postgres: DependencyStatus;
-    minio: DependencyStatus;
-  };
+  checks: DependencyChecks;
 }

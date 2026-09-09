@@ -52,7 +52,10 @@ describe('MetricsService', () => {
     service.requestStarted();
     service.requestCompleted(200, 250);
 
-    const output = service.getPrometheusText();
+    const output = service.getPrometheusText({
+      postgres: 'up',
+      minio: 'down',
+    });
 
     expect(output).toContain('# TYPE fullstack_http_requests_total counter');
     expect(output).toContain('fullstack_http_requests_total 1');
@@ -60,5 +63,11 @@ describe('MetricsService', () => {
       'fullstack_http_responses_total{status_class="2xx"} 1',
     );
     expect(output).toContain('fullstack_http_request_duration_seconds_sum 0.25');
+    expect(output).toContain(
+      'fullstack_dependency_up{dependency="postgres"} 1',
+    );
+    expect(output).toContain(
+      'fullstack_dependency_up{dependency="minio"} 0',
+    );
   });
 });

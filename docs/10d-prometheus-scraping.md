@@ -94,9 +94,15 @@ fullstack_http_requests_active 0
 
 fullstack_http_responses_total{status_class="2xx"} 6
 fullstack_http_responses_total{status_class="4xx"} 1
+
+# TYPE fullstack_dependency_up gauge
+fullstack_dependency_up{dependency="postgres"} 1
+fullstack_dependency_up{dependency="minio"} 1
 ```
 
 `# TYPE` 告诉 Prometheus 指标类型。花括号中是标签，用于有限分类。Request ID、用户 ID 和文件名不能作为标签。
+
+`fullstack_dependency_up` 使用 Gauge 表示必要依赖的当前状态：1 是可访问，0 是不可访问。它复用 `/health/ready` 的 PostgreSQL 与 MinIO 检查，但指标端点仍会正常返回文本，因此 Prometheus 的自身 `up` 与具体依赖状态可以同时观察。
 
 ## 6. 第一次查询
 
@@ -113,6 +119,14 @@ fullstack_http_requests_total
 - `job="fullstack-learning-api"`：来自配置中的 job_name。
 - `instance="host.docker.internal:3000"`：来自抓取目标。
 - 数值：最近一次抓取时 API 暴露的 Counter。
+
+还可以查询：
+
+```text
+fullstack_dependency_up
+```
+
+停止 PostgreSQL 时会出现一个很重要的组合：Prometheus 自身的 `up` 仍为 1，而 `fullstack_dependency_up{dependency="postgres"}` 变为 0。前者表示指标端点可抓取，后者表示具体业务依赖不可用。
 
 ## 7. 当前仍未加入什么
 

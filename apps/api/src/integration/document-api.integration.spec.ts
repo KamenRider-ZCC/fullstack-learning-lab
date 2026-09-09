@@ -80,6 +80,19 @@ describe('真实 HTTP + PostgreSQL + MinIO', () => {
     expect(response.body.http.requestsTotal).toBeGreaterThanOrEqual(2);
   });
 
+  it('Prometheus 指标包含真实依赖状态', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/metrics/prometheus')
+      .expect(200);
+
+    expect(response.text).toContain(
+      'fullstack_dependency_up{dependency="postgres"} 1',
+    );
+    expect(response.text).toContain(
+      'fullstack_dependency_up{dependency="minio"} 1',
+    );
+  });
+
   it('未登录不能读取文件列表', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/documents')

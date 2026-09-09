@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { DependencyChecks } from '../health/health.types.js';
 import type { HttpStatusCounts, MetricsSnapshot } from './metrics.types.js';
 
 @Injectable()
@@ -47,7 +48,7 @@ export class MetricsService {
     };
   }
 
-  getPrometheusText() {
+  getPrometheusText(dependencies: DependencyChecks) {
     const snapshot = this.getSnapshot();
     const statusLines = Object.entries(snapshot.http.responsesByStatus)
       .map(([statusClass, value]) =>
@@ -70,6 +71,10 @@ export class MetricsService {
       '# TYPE fullstack_http_request_duration_seconds summary',
       `fullstack_http_request_duration_seconds_sum ${this.totalDurationMs / 1000}`,
       `fullstack_http_request_duration_seconds_count ${this.requestsTotal}`,
+      '# HELP fullstack_dependency_up Whether a required dependency is reachable.',
+      '# TYPE fullstack_dependency_up gauge',
+      `fullstack_dependency_up{dependency="postgres"} ${this.toGauge(dependencies.postgres)}`,
+      `fullstack_dependency_up{dependency="minio"} ${this.toGauge(dependencies.minio)}`,
       '',
     ].join('\n');
   }
@@ -88,5 +93,9 @@ export class MetricsService {
 
   private toAverage(total: number, count: number) {
     return count === 0 ? 0 : Number((total / count).toFixed(2));
+  }
+
+  private toGauge(status: DependencyChecks[keyof DependencyChecks]) {
+    return status === 'up' ? 1 : 0;
   }
 }

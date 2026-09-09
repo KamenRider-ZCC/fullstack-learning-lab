@@ -8,6 +8,7 @@ import { STORAGE_HEALTH } from '../document/storage-health.port.js';
 import type { StorageHealthPort } from '../document/storage-health.port.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type {
+  DependencyChecks,
   DependencyStatus,
   HealthResponse,
   ReadinessResponse,
@@ -27,14 +28,7 @@ export class HealthService {
   }
 
   async getReadiness(): Promise<ReadinessResponse> {
-    const [postgresResult, minioResult] = await Promise.allSettled([
-      this.prisma.$queryRaw`SELECT 1`,
-      this.storageHealth.checkHealth(),
-    ]);
-    const checks = {
-      postgres: this.toDependencyStatus(postgresResult),
-      minio: this.toDependencyStatus(minioResult),
-    };
+    const checks = await this.getDependencyStatuses();
 
     if (checks.postgres === 'down' || checks.minio === 'down') {
       this.logger.warn(
@@ -48,6 +42,17 @@ export class HealthService {
     }
 
     return { ...this.createBaseResponse(), checks };
+  }
+
+  async getDependencyStatuses(): Promise<DependencyChecks> {
+    const [postgresResult, minioResult] = await Promise.allSettled([
+      this.prisma.$queryRaw`SELECT 1`,
+      this.storageHealth.checkHealth(),
+    ]);
+    return {
+      postgres: this.toDependencyStatus(postgresResult),
+      minio: this.toDependencyStatus(minioResult),
+    };
   }
 
   private createBaseResponse(): HealthResponse {
