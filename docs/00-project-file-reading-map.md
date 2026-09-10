@@ -123,7 +123,7 @@ NestJS 装饰器、Prisma API、PromQL 和 YAML 的具体写法可以随用随�
 | 文件 | 需要理解到什么程度 |
 | --- | --- |
 | [`apps/api/Dockerfile`](../apps/api/Dockerfile) 与 [`apps/web/Dockerfile`](../apps/web/Dockerfile) | 源码如何变成生产镜像，多阶段构建为什么能缩小最终镜像。 |
-| [`apps/web/nginx.conf`](../apps/web/nginx.conf) | Nginx 如何托管前端并把 `/api` 转发到后端。 |
+| [`apps/web/nginx.conf`](../apps/web/nginx.conf) | Nginx 如何托管前端、把 `/api` 转发到后端、支持 SPA 路由并提供最小健康检查。需要理解职责和请求流向，不要求背指令。 |
 | [`compose.production.yaml`](../compose.production.yaml) 与 [`.env.production.example`](../.env.production.example) | 生产服务如何组合、哪些值必须由部署环境提供、为什么镜像版本不能只写 `latest`。 |
 | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | 推送代码后依次检查、测试、构建什么；失败为什么会阻止错误版本继续发布。 |
 | [`scripts/create-backup.mjs`](../scripts/create-backup.mjs) 与 [`verify-backup.mjs`](../scripts/verify-backup.mjs) | 备份包含什么、校验什么；备份成功不等于已经验证能够恢复。 |
