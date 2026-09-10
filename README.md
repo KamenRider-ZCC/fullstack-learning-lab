@@ -352,6 +352,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 项目必读文件地图：`docs/00-project-file-reading-map.md`
 - AI 全栈必备知识地图：`docs/00-ai-fullstack-essential-guide.md`
 - 第 11A 课 YAML 最小基础：`docs/11a-yaml-for-frontend.md`
+- 第 11B 课 Docker 核心概念：`docs/11b-docker-core-concepts.md`
 - 第 4 课慢速拆解：`docs/04b-auth-code-walkthrough.md`
 - 第 5A 课：`docs/05a-local-file-upload.md`
 - 第 5B 课：`docs/05b-minio-object-storage.md`
