@@ -86,8 +86,8 @@
 - 第 11A 课（已完成）：用 JavaScript 对象类比学习最小 YAML，掌握层级、列表和值类型
 - 第 11B 课（已完成）：理解 Docker 镜像、容器、端口、Volume、网络和容器生命周期
 - 第 11C 课（已完成）：逐段拆解 `compose.yaml`，学会检查 AI 生成的 Compose 配置
-- 第 11D 课（进行中）：拆解 Dockerfile、生产镜像与最小 Nginx，理解静态文件、反向代理、SPA fallback、健康检查和 HTTPS 边界
-- 第 11E 课：沿浏览器、Nginx、NestJS、PostgreSQL、MinIO 完成一次故障定位
+- 第 11D 课（已完成）：拆解 Dockerfile、生产镜像与最小 Nginx，理解静态文件、反向代理、SPA fallback、健康检查和 HTTPS 边界
+- 第 11E 课（下一课）：沿浏览器、Nginx、NestJS、PostgreSQL、MinIO 完成一次故障定位
 - 第 11F 课：让 AI 实现一个小型全栈改动，练习需求、风险、验证和代码审查
 - 第 11G 课：独立完成最终演练并复盘，形成后续项目可复用的 AI 协作清单
 

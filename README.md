@@ -355,6 +355,7 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - 第 11B 课 Docker 核心概念：`docs/11b-docker-core-concepts.md`
 - 第 11C 课 Compose 慢速拆解：`docs/11c-compose-slow-walkthrough.md`
 - 第 11D 课 Dockerfile 与 Nginx：`docs/11d-dockerfile-nginx.md`
+- Docker、Nginx、Web 与 API 关系图：`docs/11d-docker-web-api-nginx-map.md`
 - 第 11B 课 Docker 核心概念：`docs/11b-docker-core-concepts.md`
 - 第 4 课慢速拆解：`docs/04b-auth-code-walkthrough.md`
 - 第 5A 课：`docs/05a-local-file-upload.md`
