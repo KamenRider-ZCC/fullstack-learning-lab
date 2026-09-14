@@ -33,6 +33,8 @@
 - 第 10G 课：使用 Alertmanager 接收、分组和静默已触发的告警。
 - 第 11A～11E 课：学习 YAML、Docker、Compose、Dockerfile、Nginx 与完整故障定位。
 - 第 11F 课：让 AI 完成评分说明必填与字数限制，并练习需求、风险和分层验收。
+- 第 11G 课：学习控制 Demo 范围，并形成可复用的 AI 全栈协作清单。
+- 第 12A 课（进行中）：使用只读 SQL 查询现有评分数据，不再扩展业务功能。
 
 ## 一、运行前准备
 
@@ -360,6 +362,8 @@ Docker 页面默认还会占用 8080。不能同时运行占用 3000 的 `pnpm d
 - Docker、Nginx、Web 与 API 关系图：`docs/11d-docker-web-api-nginx-map.md`
 - 第 11E 课完整故障定位：`docs/11e-end-to-end-troubleshooting.md`
 - 第 11F 课 AI 全栈改动：`docs/11f-ai-fullstack-change.md`
+- 第 11G 课最终 AI 协作演练：`docs/11g-final-ai-collaboration.md`
+- 第 12A 课只读 SQL 基础：`docs/12a-sql-readonly-basics.md`
 - 第 4 课慢速拆解：`docs/04b-auth-code-walkthrough.md`
 - 第 5A 课：`docs/05a-local-file-upload.md`
 - 第 5B 课：`docs/05b-minio-object-storage.md`
