@@ -38,16 +38,28 @@ export function ReviewScoreCard({ canScore }: ReviewScoreCardProps) {
   }, [loadDetail]);
 
   async function handleSave() {
+    if (!detail) return;
     const numericScore = Number(score);
     if (!score.trim() || Number.isNaN(numericScore)) {
       setMessageTone('error');
       setMessage('请输入有效分数');
       return;
     }
+    const normalizedFeedback = feedback.trim();
+    if (!normalizedFeedback) {
+      setMessageTone('error');
+      setMessage('请填写评分说明');
+      return;
+    }
+    if (normalizedFeedback.length > detail.reviewItem.feedbackMaxLength) {
+      setMessageTone('error');
+      setMessage(`评分说明不能超过 ${detail.reviewItem.feedbackMaxLength} 个字符`);
+      return;
+    }
     setSaving(true);
     setMessage('');
     try {
-      const data = await saveExpertScore(numericScore, feedback.trim());
+      const data = await saveExpertScore(numericScore, normalizedFeedback);
       setDetail(data);
       setMessageTone('success');
       setMessage('保存成功。现在刷新页面，分数仍会从数据库读取。');
@@ -76,7 +88,7 @@ export function ReviewScoreCard({ canScore }: ReviewScoreCardProps) {
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-violet-300">第 4 课 · 已认证专家评分</p>
+          <p className="text-sm font-semibold text-violet-300">已认证专家评分</p>
           <h2 className="mt-2 text-2xl font-semibold">{detail.reviewItem.title}</h2>
           <p className="mt-2 max-w-3xl leading-7 text-slate-400">{detail.reviewItem.description}</p>
         </div>
@@ -100,11 +112,17 @@ export function ReviewScoreCard({ canScore }: ReviewScoreCardProps) {
           />
         </label>
         <label className="grid gap-2 text-sm text-slate-300">
-          评分说明
-          <input
-            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 outline-none focus:border-sky-500"
+          <span className="flex items-center justify-between gap-3">
+            <span>评分说明</span>
+            <span className="text-xs text-slate-500">
+              {feedback.length} / {detail.reviewItem.feedbackMaxLength}
+            </span>
+          </span>
+          <textarea
+            className="min-h-24 resize-y rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 outline-none focus:border-sky-500"
             disabled={!canScore}
-            placeholder="可选"
+            maxLength={detail.reviewItem.feedbackMaxLength}
+            placeholder="必填，请简要说明评分依据"
             value={feedback}
             onChange={(event) => setFeedback(event.target.value)}
           />

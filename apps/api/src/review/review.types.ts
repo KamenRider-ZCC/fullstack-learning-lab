@@ -5,6 +5,7 @@ export interface ReviewDetailResponse {
     description: string;
     maxScore: number;
     aiScore: number;
+    feedbackMaxLength: number;
   };
   score: {
     score: number;

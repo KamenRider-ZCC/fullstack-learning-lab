@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import type { ReviewDetailResponse } from './review.types.js';
 
 const DEMO_REVIEW_ITEM_ID = 'review-progress-plan';
+export const FEEDBACK_MAX_LENGTH = 200;
 
 @Injectable()
 export class ReviewService implements OnModuleInit {
@@ -53,13 +54,32 @@ export class ReviewService implements OnModuleInit {
         message: '分数必须按 0.5 分递增',
       });
     }
+    const normalizedFeedback = feedback.trim();
+    if (!normalizedFeedback) {
+      throw new BadRequestException({
+        code: 'FEEDBACK_REQUIRED',
+        message: '请填写评分说明',
+      });
+    }
+    if (normalizedFeedback.length > FEEDBACK_MAX_LENGTH) {
+      throw new BadRequestException({
+        code: 'FEEDBACK_TOO_LONG',
+        message: `评分说明不能超过 ${FEEDBACK_MAX_LENGTH} 个字符`,
+      });
+    }
 
     const savedScore = await this.prisma.expertScore.upsert({
       where: {
         reviewItemId_bidderId_expertId: { reviewItemId, bidderId, expertId },
       },
-      update: { score, feedback },
-      create: { reviewItemId, bidderId, expertId, score, feedback },
+      update: { score, feedback: normalizedFeedback },
+      create: {
+        reviewItemId,
+        bidderId,
+        expertId,
+        score,
+        feedback: normalizedFeedback,
+      },
     });
     return this.toResponse(item, savedScore);
   }
@@ -83,6 +103,7 @@ export class ReviewService implements OnModuleInit {
         description: item.description,
         maxScore: item.maxScore,
         aiScore: item.aiScore,
+        feedbackMaxLength: FEEDBACK_MAX_LENGTH,
       },
       score: score
         ? {

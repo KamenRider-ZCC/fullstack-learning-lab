@@ -11,6 +11,7 @@ export interface ReviewDetail {
     description: string;
     maxScore: number;
     aiScore: number;
+    feedbackMaxLength: number;
   };
   score: {
     score: number;

@@ -34,7 +34,7 @@ export class ReviewController {
       body.bidderId,
       user.id,
       body.score,
-      body.feedback || '',
+      body.feedback,
     );
   }
 }

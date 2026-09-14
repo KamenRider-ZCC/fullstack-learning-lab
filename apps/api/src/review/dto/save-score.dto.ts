@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class SaveScoreDto {
   @IsString({ message: 'bidderId 必须是字符串' })
@@ -11,7 +11,7 @@ export class SaveScoreDto {
   )
   score!: number;
 
-  @IsOptional()
   @IsString({ message: 'feedback 必须是字符串' })
-  feedback?: string;
+  @IsNotEmpty({ message: 'feedback 不能为空' })
+  feedback!: string;
 }

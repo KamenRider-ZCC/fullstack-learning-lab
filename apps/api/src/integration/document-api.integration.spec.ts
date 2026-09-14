@@ -152,6 +152,30 @@ describe('真实 HTTP + PostgreSQL + MinIO', () => {
     expect(forgedResponse.body.code).toBe('VALIDATION_ERROR');
     expect(forgedResponse.body.details.join(' ')).toContain('expertId');
 
+    const blankFeedbackResponse = await request(app.getHttpServer())
+      .put('/api/review-items/review-progress-plan/score')
+      .set('Authorization', bearer(expertToken))
+      .send({
+        bidderId: 'integration-bidder',
+        score: 3.5,
+        feedback: '   ',
+      })
+      .expect(400);
+
+    expect(blankFeedbackResponse.body.code).toBe('FEEDBACK_REQUIRED');
+
+    const longFeedbackResponse = await request(app.getHttpServer())
+      .put('/api/review-items/review-progress-plan/score')
+      .set('Authorization', bearer(expertToken))
+      .send({
+        bidderId: 'integration-bidder',
+        score: 3.5,
+        feedback: '字'.repeat(201),
+      })
+      .expect(400);
+
+    expect(longFeedbackResponse.body.code).toBe('FEEDBACK_TOO_LONG');
+
     const savedResponse = await request(app.getHttpServer())
       .put('/api/review-items/review-progress-plan/score')
       .set('Authorization', bearer(expertToken))
